@@ -1,0 +1,11 @@
+inicializar npm init
+para que corra la app es: npm run dev
+
+Users
+    Admin: Admin@admin.com  Password: 123
+    otros: lab2@gmail.com Password: 123
+
+solo el admin puede crear categorias
+el otro usuario tiene cargado 4 items 2 listas(cada lista tiene algun item) solo un item 
+tiene fecha resolucion ya que su estado es resuelto 
+

@@ -1,0 +1,89 @@
+<div class="col-md-4 mx-auto ">
+    <div class="card text-center border-primary mb-3">
+         <div class="card-header">
+                <h2 class="text-center">Agregar Horarios</h2><br>
+                <div class="card-body ">
+                    <form action="/agregar" method="POST">
+
+                        <div class="input-group mb-3">
+                            <span class="form-control input-group-text">Materia</span>
+                            <select name="materiasID" class="form-select">
+                            {{#each materia}} <option value={{idMateria}}>{{nombreMateria}}</option>{{/each}}
+                            </select>
+                        </div>
+                        <div class="input-group mb-3">    
+                            <span class="form-control input-group-text">Lunes &nbsp;   
+                                <input class="form-check-input" type="checkbox" id="cbLunes" name="lunes" value="Lunes">
+                            </span>         
+                            <input type="time" id="tiLunes" class="form-control" name="horaInicioLunes" min="9:00" max="20:00" disabled>
+                            <input type="time" id="tfLunes" class="form-control" name="horaFinLunes" min="10:00" max="22:00" disabled>
+                        </div>
+                            
+                        <div class="input-group mb-3">    
+                            <span class="form-control input-group-text">Martes &nbsp;  
+                                <input class="form-check-input" type="checkbox" id="cbMartes" name="martes" value="Martes">
+                            </span>         
+                            <input type="time" id="tiMartes" class="form-control" name="horaInicioMartes" min="9:00" max="20:00" disabled>
+                            <input type="time" id="tfMartes" class="form-control" name="horaFinMartes" min="10:00" max="22:00" disabled>
+                        </div>
+                            
+                        <div class="input-group mb-3">    
+                            <span class="form-control input-group-text">Mierco &nbsp;   
+                                <input class="form-check-input" type="checkbox" id="cbMiercoles" name="miercoles" value="Miercoles">
+                            </span>         
+                            <input type="time" id="tiMiercoles" class="form-control" name="horaInicioMiercoles" min="9:00" max="20:00" disabled>
+                            <input type="time" id="tfMiercoles"  class="form-control" name="horaFinMiercoles" min="10:00" max="22:00" disabled>
+                        </div>
+                            
+                        <div class="input-group mb-3">    
+                            <span class="form-control input-group-text">Jueves &nbsp;  
+                                <input class="form-check-input" type="checkbox" id="cbJueves" name="jueves" value="Jueves">
+                            </span>         
+                            <input type="time" id="tiJueves" class="form-control" name="horaInicioJueves" min="9:00" max="20:00" disabled >
+                            <input type="time" id="tfJueves" class="form-control" name="horaFinJueves" min="10:00" max="22:00" disabled>
+                        </div>
+                            
+                        <div class="input-group mb-3">    
+                            <span class="form-control input-group-text">Viernes &nbsp;
+                                <input class="form-check-input" type="checkbox" id="cbViernes" name="viernes" value="Viernes">
+                            </span>         
+                            <input type="time" id="tiViernes" class="form-control" name="horaInicioViernes" min="9:00" max="20:00" disabled>
+                            <input type="time" id="tfViernes" class="form-control" name="horaFinViernes" min="10:00" max="22:00" disabled>
+                        </div>
+                        <div class="form-group">
+                            <input class="btn btn-success w-100" type="submit" value="Agregar Horario">
+                        </div>
+                    </form>
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.getElementById('cbLunes').onchange = function() {
+    document.getElementById('tiLunes').disabled = !this.checked;
+    document.getElementById('tfLunes').disabled = !this.checked;
+};
+
+    document.getElementById('cbMartes').onchange = function() {
+    document.getElementById('tiMartes').disabled = !this.checked;
+    document.getElementById('tfMartes').disabled = !this.checked;
+};    
+
+    document.getElementById('cbMiercoles').onchange = function() {
+    document.getElementById('tiMiercoles').disabled = !this.checked;
+    document.getElementById('tfMiercoles').disabled = !this.checked;
+};
+
+    document.getElementById('cbJueves').onchange = function() {
+    document.getElementById('tiJueves').disabled = !this.checked;
+    document.getElementById('tfJueves').disabled = !this.checked;
+};
+
+    document.getElementById('cbViernes').onchange = function() {
+    document.getElementById('tiViernes').disabled = !this.checked;
+    document.getElementById('tfViernes').disabled = !this.checked;
+};
+
+</script>

@@ -1,0 +1,70 @@
+
+<div class = "scroll"> 
+    <div class="container p-4 text-center ">
+        <div class="row">
+
+            <h1> {{#nombreMat}} {{nombreMateria}} {{/nombreMat}}</h1>
+
+            <h2> ASISTENCIAS POR DIA</h2>
+                <h1></h1>
+                <h1></h1>
+                <form action="/asistencia/asisPD" method="GET">
+                        <div class="form-group">   
+                        <select id="jo" name="asisSel" onchange="myFunction()"> 
+                                    <option value="null" selected>----</option>
+                                    {{#each fecha}} <option value="{{fecha}}">{{moment fecha format="DD/MM/YYYY" }}</option> {{/each}}
+                                    
+                        </select>
+                        <div>
+                            <input type="hidden" id="id" name="id" value={{id}}>
+                        </div>
+                            <div class="form-group">
+                                <br>
+                                <button class="btn btn-success w-100">
+                                    Buscar
+                                </button>
+                            </div>
+                        </form>
+                    <br>
+                    <br>
+                    
+                    <h1> ASISTENCIAS DE TODA LA MATERIA</h1>    
+                    <br>
+                    <br>
+                        <table id="testTable" name="table" class="table table-hover">
+                                <tr>
+                                    {{#each titleKeys as | key |}}
+                                    <th>{{key}}</th>
+                                    {{/each}}
+                                </tr>
+                                    {{#each asistZZ as | user |}}
+                                <tr>
+                                    {{#each ../keys as | key |}}
+                                    <th>{{lookup user key}}</th>
+                                    {{/each}}
+                                </tr>
+                                {{/each}}
+                        </table>
+
+                    </div>
+                    <input type="button" style="text-align:center;" onclick="tableToExcel('testTable', 'TABLA')" value="Exportar a Excel">                    
+            </div>
+            
+    </div>
+
+<div>
+
+
+<script>
+    var tableToExcel = (function() {
+  var uri = 'data:application/vnd.ms-excel;base64,'
+    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+    , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+    , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
+  return function(table, name) {
+    if (!table.nodeType) table = document.getElementById(table)
+    var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+    window.location.href = uri + base64(format(template, ctx))
+  }
+})()
+</script>    

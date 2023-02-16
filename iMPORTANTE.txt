@@ -1,0 +1,6 @@
+<div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Fecha Limite" disabled>
+            <input type="date"  name="fechaLimite" min="{{moment format="YYYY-MM-DD"}}" 
+            value="{{moment format="YYYY-MM-DD"}}" class="form-control">
+        </div>
+UTILIZAR LOS MOMENT PARA EL FORMATO DE NUESTROS HORARIOS 

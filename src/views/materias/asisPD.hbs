@@ -1,0 +1,67 @@
+<div class = "scroll"> 
+<div class="container p-4">
+    <h1 > {{#nombreMat}} {{nombreMateria}} {{/nombreMat}}</h1>
+    <br>
+    <div class="row">
+        <h1 style="text-align:center;"> ASISTENCIAS</h1> 
+     
+        <h1 style="text-align:center;"> {{#fecha}} <th> {{moment fecha format="DD/MM/YYYY"}} </th> {{/fecha}}  </h1> 
+        
+            <form action="/asistencia/dictadoClase/{{#fecha}} {{moment fecha format="YYYY-MM-DD"}} {{/fecha}}/{{#dic}} {{horID}} {{/dic}}" method="POST">
+                                <div style="text-align: center;" class="form-group">
+                                    <button  class="btn btn-success">No dictado Clase</button>
+                                </div>
+                                </form>  
+                                </div>
+                                <br>
+                    <table id="testTable" name="table" style="width:100%">
+                        
+                        <tr>
+                            
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Presente</th>
+                            <th>Dictado</th>
+                           
+                        </tr>
+                        
+                        {{#each asi}} 
+                        <tr>
+                            
+                        
+                            <th>{{usuario}}</th>
+                            <th>{{nombre}}</th>
+                            <th>{{apellido}} </th>
+                            <th>{{presente}}</th>
+                            <th>{{dictado}}</th>
+                        
+                        </tr>
+                        {{/each}}     
+                        </table>
+                        <br>
+        <div  class="form-group">
+        <input  type="button" onclick="tableToExcel('testTable', 'TABLA')" value="Exportar a Excel">
+        </div>
+    </div>
+    
+</div >
+
+</div>
+
+
+
+<script>
+    var tableToExcel = (function() {
+  var uri = 'data:application/vnd.ms-excel;base64,'
+    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+    , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+    , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
+  return function(table, name) {
+    if (!table.nodeType) table = document.getElementById(table)
+    var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+    window.location.href = uri + base64(format(template, ctx))
+  }
+})()
+</script>
+

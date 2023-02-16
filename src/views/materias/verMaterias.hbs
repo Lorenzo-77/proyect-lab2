@@ -1,0 +1,65 @@
+<script> 
+   function clickAndDisable(link) {
+     // disable subsequent clicks
+     link.onclick = function(event) {
+        event.preventDefault();
+     }
+   }   
+</script>
+
+<div class="container p-4">
+    <div class="row">
+        {{#each materias }}
+             <div class="col md-3">
+                 <div class="card text-center text-white bg-secondary mb-3"> 
+                     <div class="card-body">
+                            <h4 class="card-title justify-content-between align-items-center">
+                                 {{nombreMateria}}
+                             </h4>
+                         </a>
+                         
+                         <p class="m-2">Profesor {{nombre}} {{apellido}}</p>
+                         <p class="m-2">{{lunes}} {{horaInicioLunes}}  {{horaFinLunes}}</p>
+                         <p class="m-2">{{martes}} {{horaInicioMartes}}  {{horaFinMartes}}</p>
+                         <p class="m-2">{{miercoles}} {{horaInicioMiercoles}}  {{horaFinMiercoles}}</p>
+                         <p class="m-2">{{jueves}} {{horaInicioJueves}}  {{horaFinJueves}}</p>
+                         <p class="m-2">{{viernes}} {{horaInicioViernes}}  {{horaFinViernes}}</p>
+                        
+                        {{#if (nMateria)}}
+                           <a href="/materias/inscribir/{{idHorarios}}" class="btn btn-outline-light" >Inscribirse</a> 
+                        {{/if}}
+                        
+                        
+                         <a href="/materias/inscribir/{{idHorarios}}" class="btn btn-outline-light" >Inscribirse</a>
+
+                     </div>
+                 </div>
+             </div>
+        {{else}}  
+            <div class="col-md-4 mx-auto">
+                <div class="card card-body text-center">
+                    <P>No hay Inscripciones Guardados.</P>
+                    
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>
+<!--
+<div class="row">
+<h3>Materia</h3>
+  {{#each materia}}
+    <div class="col-md-3">      
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body">
+          <h4 class="card-title d-flex justify-content-between align-items-center">
+            {{nombreMateria}}  
+          </h4>
+
+           <a class="btn btn-light btn-block btn-sm" href="/materias/inscripcion/{{alumnoId}}">Registrarse</a>
+
+        </div>
+      </div>
+    </div>
+    {{/each}}
+</div>-->

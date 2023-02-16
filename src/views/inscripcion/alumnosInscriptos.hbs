@@ -1,0 +1,63 @@
+<div class = "scroll"> 
+<div class="container p-4 text-center">
+    
+    <div class="row">
+        <h3 class="text-info"> Alumnos Inscriptos</h3> 
+        <h1  class="text-success"> {{#materias}} <th> {{nombreMateria}} </th> {{/materias}}  </h1> 
+         <div class="col-md-4 mx-auto">
+                <div class="card card-body text-center border-success">
+                    {{#each horarios }}
+                         <h4 class="m-2">{{lunes}} {{horaInicioLunes}}  {{horaFinLunes}}</h4>
+                         <h4 class="m-2">{{martes}} {{horaInicioMartes}} {{horaFinMartes}}</h4>
+                         <h4 class="m-2">{{miercoles}} {{horaInicioMiercoles}}  {{horaFinMiercoles}}</h4>
+                         <h4 class="m-2">{{jueves}} {{horaInicioJueves}}  {{horaFinJueves}}</h4>
+                         <h4 class="m-2">{{viernes}} {{horaInicioViernes}}  {{horaFinViernes}}</h4>
+                    {{/each}}     
+                    
+                </div>
+         </div>            
+                    <table class="table table-hover" id="testTable" name="table" >
+                       
+                        <tr class="table-light">
+                            
+                            <th>Email</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Estado Alumno</th>
+                            <th>Conflicto de Horarios</th>        
+                           
+                        </tr>
+                        
+                        {{#each alumitos}} 
+                        <tr>
+                            
+                        
+                            <th>{{email}}</th>
+                            <th>{{nombre}}</th>
+                            <th>{{apellido}} </th>    
+                            <th>
+                                <form action="/inscripcion/cambiarEstado/{{alumnoId}}/{{materiaId}}" method="POST">
+                                <div style="text-align: center;" class="form-group">
+                                    {{valAlumno}} 
+                                    <button class="badge rounded-pill bg-light">Cambiar Estado</button>
+                                </div>
+                                </form>    
+                            </th>
+                            <th> <p>Lunes: {{conflictoLunes}} <br>
+                                    Martes: {{conflictoMartes}} <br>
+                                    Miercoles: {{conflictoMiercoles}} <br>
+                                    Jueves: {{conflictoJueves}} <br>
+                                    Viernes: {{conflictoViernes}} <br></p>   </th>   
+                        
+                        </tr>
+                        
+                        {{/each}}     
+                        </table>
+        
+       
+        
+    </div>
+    
+</div >
+
+</div>
