@@ -17,5 +17,7 @@ routerProfe.get('/inscripcion/listarAlumnos/:id',isLoggedIn,auth("profesor"), Pr
 
 routerProfe.post('/inscripcion/cambiarEstado/:id/:materia', isLoggedIn, ProfeController.estadoInscrip);
 
+routerProfe.get('/asistencia/asisPD', isLoggedIn, ProfeController.asistPD);
+routerProfe.post('/asistencia/asisPD', isLoggedIn, ProfeController.asistPD2);
 
 module.exports = routerProfe;

@@ -1,5 +1,6 @@
 ////// ITEMS //////🦖🦖🦖
 const pool = require('../database');
+const moment = require('moment');
 
 function index(req, res) {
 
@@ -261,9 +262,20 @@ function index(req, res) {
   
   }
 
+  async function asistPD ( req, res) { 
+    var z = Date.parse(req.query.asisSel);
+    var y = moment(z);
+    const asi = await pool.query('SELECT DISTINCT email, nombre, apellido, presente, dictado FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND idAlum = alumnoId AND horaId = ? AND fecha = ?', [req.query.id, y.format("YYYY-MM-DD") ]);
+    const fecha = await pool.query('SELECT DISTINCT fecha FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND idAlum = alumnoId AND horaId = ? AND fecha = ? ', [req.query.id, y.format("YYYY-MM-DD") ]);
+    const dic = await pool.query('SELECT DISTINCT horaId, fecha FROM asistencias, horarios WHERE horaId = idHorarios AND horaId = ? AND fecha = ? ', [req.query.id, y.format("YYYY-MM-DD") ]);
+    const nombreMat = await pool.query('SELECT DISTINCT nombreMateria FROM horarios, materias WHERE materiasID = idMateria AND idHorarios = ?' , [req.query.id]);
+    res.render('materias/asisPD', {asi, fecha, dic, nombreMat});
 
+  }
 
- 
+ function asistPD2(req,res){
+  res.redirect('/asistencia/asisPD');
+ }
 
   module.exports = {
     index: index,
@@ -274,4 +286,6 @@ function index(req, res) {
     asistencia: asistencia,
     inscriptos:inscriptos,
     estadoInscrip:estadoInscrip,
+    asistPD: asistPD,
+    asistPD2:asistPD2
   }

@@ -18,7 +18,7 @@ function createMateria(req, res) {
     req.getConnection((err, conn) => {
       conn.query('INSERT INTO materias SET ?', [data], (err, rows) => {
 
-        res.redirect('/profile'); 
+        res.redirect('/crear/createMateria'); 
       });
     });
   }
@@ -45,7 +45,7 @@ function createMateria(req, res) {
     console.log(data.idMateria)
     req.getConnection((err, conn) => {
       conn.query('UPDATE materias SET profeCargo = ? WHERE materias.idMateria = ?', [data.profeCargo,data.idMateria], (err, rows) => {
-        res.redirect('/profile');
+        res.redirect('/crear/asignarProfesor');
       });
     });
   }

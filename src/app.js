@@ -44,7 +44,7 @@ app.use(myconnection(mysql, {
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'to-do' //to-do
+  database: 'integrador' //to-do
 }, 'single'));
 
 app.use(session({

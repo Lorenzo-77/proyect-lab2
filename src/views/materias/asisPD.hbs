@@ -1,28 +1,28 @@
 <div class = "scroll"> 
-<div class="container p-4">
+<div class="container p-4  text-center">
     <h1 > {{#nombreMat}} {{nombreMateria}} {{/nombreMat}}</h1>
     <br>
     <div class="row">
-        <h1 style="text-align:center;"> ASISTENCIAS</h1> 
+        <h1 > ASISTENCIAS</h1> 
      
-        <h1 style="text-align:center;"> {{#fecha}} <th> {{moment fecha format="DD/MM/YYYY"}} </th> {{/fecha}}  </h1> 
+        <h1> {{#fecha}} <th> {{moment fecha format="DD/MM/YYYY"}} </th> {{/fecha}}  </h1> 
         
             <form action="/asistencia/dictadoClase/{{#fecha}} {{moment fecha format="YYYY-MM-DD"}} {{/fecha}}/{{#dic}} {{horID}} {{/dic}}" method="POST">
-                                <div style="text-align: center;" class="form-group">
+                                <div class="form-group">
                                     <button  class="btn btn-success">No dictado Clase</button>
                                 </div>
                                 </form>  
                                 </div>
                                 <br>
-                    <table id="testTable" name="table" style="width:100%">
+                    <table id="testTable" name="table" class="table table-hover">
                         
                         <tr>
                             
-                            <th>Usuario</th>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Presente</th>
-                            <th>Dictado</th>
+                            <th >Email</th>
+                            <th >Nombre</th>
+                            <th >Apellido</th>
+                            <th >Presente</th>
+                            <th >Dictado</th>
                            
                         </tr>
                         
@@ -30,17 +30,17 @@
                         <tr>
                             
                         
-                            <th>{{usuario}}</th>
-                            <th>{{nombre}}</th>
-                            <th>{{apellido}} </th>
-                            <th>{{presente}}</th>
-                            <th>{{dictado}}</th>
+                            <th> {{email}}</th>
+                            <th >{{nombre}}</th>
+                            <th >{{apellido}} </th>
+                            <th >{{presente}}</th>
+                            <th> {{dictado}}</th>
                         
                         </tr>
                         {{/each}}     
                         </table>
                         <br>
-        <div  class="form-group">
+        <div style="text-align: center;" class="form-group">
         <input  type="button" onclick="tableToExcel('testTable', 'TABLA')" value="Exportar a Excel">
         </div>
     </div>

@@ -47,73 +47,11 @@ function index(req, res) {
       });
     });
   }
-  /*
-  function destroy(req, res) {
-    const id = req.body.id;
-    req.getConnection((err, conn) => {
-      conn.query('DELETE FROM item WHERE id = ?', [id], (err, rows) => {
-        res.redirect('/tasks');
-      });
-    })
-  }
   
-  function edit(req, res) {
-    const id = req.params.id;
-    req.getConnection((err, conn) => {
-      conn.query('SELECT * FROM item WHERE id = ?', [id], (err, item) => {
-        if(err) {
-          res.json(err);
-        }
-        res.render('tasks/edit', { item });
-      });
-    });
-  }
-  
-  function update(req, res) {
-    const id = req.params.id;
-    const data = req.body;
-    const date = new Date();
-    if(data.estado == "Resuelta"){  //validacion de fecha resolucion
-       data.fechaResolucion = date;}
-    
-    req.getConnection((err, conn) => {
-      conn.query('UPDATE item SET ? WHERE id = ?', [data, id], (err, rows) => {
-        res.redirect('/tasks');
-      });
-    });
-  }
-
-  function editadd(req, res) {
-    const id = req.params.id;
-    req.getConnection((err, conn) => {
-      conn.query('SELECT * FROM item WHERE id = ? ', [id], (err, item) => {
-        conn.query('SELECT * FROM lista WHERE idUser = ?',[req.user.id], (err, lista) => {
-        if(err) {
-          res.json(err);
-        }
-        res.render('tasks/edit-add', { item, lista });
-      });
-    });
-  });
-}
-  
-  function updateadd(req, res) {
-    const id = req.params.id;
-    const data = req.body;
-    req.getConnection((err, conn) => {
-      conn.query('UPDATE item SET ? WHERE id = ?', [data, id], (err, rows) => {
-        res.redirect('/tasks');
-      });
-    });
-  }*/
 
   module.exports = {
     index: index,
     inscribir: inscribir,
     store: store,
-    /*destroy: destroy,
-    edit: edit,
-    update: update,
-    editadd: editadd,
-    updateadd: updateadd,*/
+
   }
