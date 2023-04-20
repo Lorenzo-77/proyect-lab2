@@ -4,6 +4,6 @@ module.exports = {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'integrador'//to-do
+        database: 'to-do'//to-do
     }
 };

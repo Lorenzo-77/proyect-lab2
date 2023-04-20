@@ -7,6 +7,7 @@ const routerLogin = express.Router();
 routerLogin.get('/login', (req, res) => {
   res.render('login/ingreso');
 });
+
 routerLogin.post('/auth', (req, res, next) =>{
   passport.authenticate('local.auth', {
     successRedirect: '/profile',

@@ -21,7 +21,9 @@
   </head>
   <body>
      <div id="wrapper">
-    {{>navigation}}
+    {{#if usuarioLogueado}}
+        {{>navigation}}
+    {{/if}}
     <main class="container p-5">
        {{{body}}}
     </main>

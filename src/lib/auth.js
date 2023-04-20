@@ -1,9 +1,11 @@
 const isLoggedIn = (req, res, next)=> {
         if (req.isAuthenticated()) {
+            res.locals.usuarioLogueado = true;
             const usu = req.user.rol;
             console.log(usu);
             return next();
         }
+        res.locals.usuarioLogueado = false;
         return res.redirect('/login');
     }
 
