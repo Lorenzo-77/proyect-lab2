@@ -5,15 +5,15 @@
     </div>
     <div class="card-body">
         <form action="" method="post"> 
-        <div class="input-group mb-3">
-         <select name="profeCargo" class="form-select" aria-label="Default select example" >
+        <div class="input-group mb-3 ">
+         <select name="profeCargo" class="form-control text-center" aria-label="Default select example" >
             {{#each profesores}}
-              <option class="form-control" value={{idProfe}}> {{nombre}}</option>
+              <option  value={{id}}> {{nombre}}</option>
             {{/each}}
           </select>
         </div>
          <div class="input-group mb-3">
-          <select name="idMateria" class="form-select" aria-label="Default select example" >
+          <select name="idMateria"  class="form-control text-center" aria-label="Default select example" >
             {{#each materias}}
             <option class="form-control" value={{idMateria}}> {{nombreMateria}}</option>
             {{/each}}

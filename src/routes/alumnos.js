@@ -11,25 +11,26 @@ routerAlumno.get('/materias',isLoggedIn,auth("alumno"), AlumnoController.index);
 
 routerAlumno.get('/materias/inscribir/:id', isLoggedIn,auth("alumno"), async (req,  res) => {
     const {id} = req.params;
-    console.log(id);
-    const horarios = await pool.query(`SELECT idHorarios, idAlum, materiasID, idMateria, profeCargo, idProfe, horaInicioLunes, 
-    horaFinLunes, lunes, horaInicioMartes, horaFinMartes, martes, horaInicioMiercoles, horaFinMiercoles, miercoles, horaInicioJueves, 
-    horaFinJueves, jueves, horaInicioViernes, horaFinViernes, viernes, profesores.nombre, profesores.apellido, 
-    nombreMateria FROM horarios, materias, profesores, alumnos WHERE (materiasID = idMateria) 
-    AND (profeCargo = idProfe) AND idAlum = ? AND idHorarios = ?`, [req.user.idAlum, id])
+    console.log(id,req.user.id);
+    const horarios = await pool.query(` SELECT idHorarios, alumnos.id as alumnoID, materiasID, idMateria, profesores.id as profesorID, horariosdetalles.dia, horariosdetalles.hora_inicio, horariosdetalles.hora_fin, profesores.nombre, profesores.apellido, nombreMateria 
+    FROM horarios, materias, profesores, alumnos, horariosdetalles 
+    WHERE (materias.idMateria = horarios.materiasID) 
+        AND (materias.profeCargo = profesores.id) 
+        AND horariosdetalles.idHorario = horarios.idhorarios 
+        AND alumnos.id = ? AND horarios.idhorarios = ?`, [req.user.id, id])
     const [horaZ] = horarios;
     console.log(horaZ);
     const nuevaInscripcion = {
-        alumnoId: horaZ.idAlum,
-        profesorId: horaZ.idProfe,
+        idAlumno: horaZ.alumnoID,
+        idProfesor: horaZ.profesorID,
         materiaId:  horaZ.idMateria,
         valAlumno: "Invalido"
     }
-    const condi = await pool.query (`SELECT DISTINCT IF(alumnoId = ? AND profesorId = ?
+    const condi = await pool.query (`SELECT DISTINCT IF(idAlumno = ? AND idProfesor = ?
         AND materiaId = ?, "YES", "NO") AS condi FROM inscripciones  
-        ORDER BY condi DESC LIMIT 1 `, [horaZ.idAlum, horaZ.idProfe, horaZ.idMateria])
-    const [con] =  condi
-    console.log(con);
+        ORDER BY condi DESC LIMIT 1 `, [horaZ.id, horaZ.profeCargo, horaZ.idMateria])
+    const [con] =  condi;
+    console.log("Nuena inscr:",nuevaInscripcion);
     console.log(condi);
     
     if(con === undefined){

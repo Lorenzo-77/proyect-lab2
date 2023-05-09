@@ -3,17 +3,37 @@ const moment = require('moment');
 
 function index(req, res) {
   req.getConnection((err, conn) => {
-    conn.query(`SELECT DISTINCT materiaId, idHorarios, idAlum, materiasID, idMateria, profeCargo, idProfe, horaInicioLunes, 
-    horaFinLunes, lunes, horaInicioMartes, horaFinMartes, martes, horaInicioMiercoles, horaFinMiercoles, miercoles, 
-    horaInicioJueves, horaFinJueves, jueves, horaInicioViernes, horaFinViernes, viernes, profesores.nombre, 
-    profesores.apellido, nombreMateria, valAlumno FROM horarios, materias, profesores, alumnos, 
-    inscripciones WHERE valAlumno = "Valido" AND (materiasID = idMateria) 
-    AND materiaId = idMateria AND (profeCargo = profesorId) 
-    AND idProfe = profeCargo AND idAlum = alumnoId AND idAlum = ?`, [req.user.idAlum], (err, horario) => {
+    conn.query(`SELECT DISTINCT materias.idMateria, horarios.idhorarios, alumnos.id, materiasID, idMateria, 
+    profeCargo, profesores.id, profesores.nombre, dia, horariosdetalles.hora_inicio, hora_fin, profesores.apellido, 
+    nombreMateria, valAlumno FROM horarios, horariosdetalles, materias, profesores, alumnos, inscripciones 
+    WHERE valAlumno = "Valido" AND (materiasID = idMateria) 
+    AND materiaId = idMateria AND (profeCargo = profesores.id)  AND horariosdetalles.idHorario = horarios.idhorarios
+    AND profesores.id = profeCargo AND alumnos.id = idAlumno AND alumnos.id =  ?`, [req.user.id], (err, horario) => {
       if(err) {
         res.json(err);
       }
-      res.render('materias/listaAsistencias', { horario });
+      const materias = horario.reduce((acc, cur) => {
+        if (!acc[cur.idMateria]) {
+          acc[cur.idMateria] = {
+            idMateria: cur.idMateria,
+            idhorarios: cur.idhorarios,
+            nombreMateria: cur.nombreMateria,
+            nombre: cur.nombre,
+            apellido: cur.apellido,
+            horarios: []
+          };
+        }
+        acc[cur.idMateria].horarios.push({
+          idHorario: cur.idHorario,
+          dia: cur.dia,
+          hora_inicio: cur.hora_inicio,
+          hora_fin: cur.hora_fin,
+          
+        });
+        return acc;
+      }, {});
+      const materiasArr = Object.values(materias);
+      res.render('materias/listaAsistencias', { materiasArr });
     });
   });
 }

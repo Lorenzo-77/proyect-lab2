@@ -1,24 +1,32 @@
 const pool = require('../database');
 
-function createMateria(req, res) {
-  req.getConnection((err, conn) => {
-    conn.query('SELECT * FROM profesores', (err, profesores) => {
-      if(err) {
-        res.json(err);
-      }
-      res.render('crear/createMateria',{profesores});
-    });
-  });
-  }
-  
-  function storeMateria(req, res) {
-    const {nombreMateria} = req.body;
-    const data = {nombreMateria};
-
+  function createMateria(req, res) {
     req.getConnection((err, conn) => {
-      conn.query('INSERT INTO materias SET ?', [data], (err, rows) => {
-
-        res.redirect('/crear/createMateria'); 
+      conn.query('SELECT * FROM profesores', (err, profesores) => {
+        if(err) {
+          res.json(err);
+        }
+        res.render('crear/createMateria',{profesores});
+      });
+    });
+    }
+  function storeMateria(req, res) {
+    const {nombreMateria,Año,tipo_fecha,fecha_inicio,fecha_fin} = req.body;
+    const data = {nombreMateria,Año};
+    const fecha = {tipo_fecha,fecha_inicio,fecha_fin};
+    req.getConnection((err, conn) => {
+      conn.query('INSERT INTO materias SET ?', [data], (err, result) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        const materiaId = result.insertId; // obtiene el idMateria recién insertado
+        const dataFecha = { ...fecha, materiaId }; // añade el idMateria a la información de la fecha
+        conn.query('INSERT INTO fechas SET ?', [dataFecha], (err, rows) => {
+          if (err) {
+            return res.status(500).send(err);
+          }
+          res.redirect('/createMateria');
+        });
       });
     });
   }
@@ -45,7 +53,7 @@ function createMateria(req, res) {
     console.log(data.idMateria)
     req.getConnection((err, conn) => {
       conn.query('UPDATE materias SET profeCargo = ? WHERE materias.idMateria = ?', [data.profeCargo,data.idMateria], (err, rows) => {
-        res.redirect('/crear/asignarProfesor');
+        res.redirect('/asignarProfesor');
       });
     });
   }

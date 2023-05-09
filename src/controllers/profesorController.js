@@ -3,22 +3,50 @@ const pool = require('../database');
 const moment = require('moment');
 
 function index(req, res) {
-
-    req.getConnection((err, conn) => {
-      conn.query('SELECT * FROM horarios, materias, profesores WHERE materiasID = idMateria AND profeCargo = idProfe AND idProfe = ?', [req.user.idProfe], (err, horario) => {
-        if(err) {
-          res.json(err);
+  req.getConnection((err, conn) => {
+    conn.query(`SELECT materias.idMateria, materias.nombreMateria, horariosdetalles.dia, horariosdetalles.hora_inicio, horariosdetalles.hora_fin, profesores.nombre, profesores.apellido, horarios.idhorarios
+    FROM horarios
+    JOIN materias ON materias.idMateria = horarios.materiasID
+    JOIN horariosdetalles ON horariosdetalles.idHorario = horarios.idhorarios
+    JOIN profesores ON profesores.id = materias.profeCargo
+    WHERE profesores.id = ?
+    GROUP BY materias.idMateria, horariosdetalles.dia, horariosdetalles.hora_inicio, horariosdetalles.hora_fin, horarios.idhorarios    
+    `, [req.user.id], (err, horario) => {
+      if(err) {
+        res.json(err);
+      }
+      const materias = horario.reduce((acc, cur) => {
+        if (!acc[cur.idMateria]) {
+          acc[cur.idMateria] = {
+            idMateria: cur.idMateria,
+            idhorarios: cur.idhorarios,
+            nombreMateria: cur.nombreMateria,
+            nombre: cur.nombre,
+            apellido: cur.apellido,
+            horarios: []
+          };
         }
-        res.render('materias/verHorarios', { horario });
-      });
+        acc[cur.idMateria].horarios.push({
+          idHorario: cur.idHorario,
+          dia: cur.dia,
+          hora_inicio: cur.hora_inicio,
+          hora_fin: cur.hora_fin,
+          
+        });
+        return acc;
+      }, {});
+      const materiasArr = Object.values(materias);
+      res.render('materias/verHorarios', { materiasArr });
     });
+  });
+  
   }
 
   function addMateria(req, res) {
     
     req.getConnection((err, conn) => {
         
-        conn.query('SELECT * FROM materias, profesores WHERE profeCargo = idProfe AND idProfe = ?',[req.user.idProfe], (err, materia) => {
+        conn.query('SELECT * FROM materias, profesores WHERE profeCargo = id AND id = ?',[req.user.id], (err, materia) => {
         if(err) {
           res.json(err);
         }
@@ -27,7 +55,30 @@ function index(req, res) {
 
   });
 }
-  
+
+function insertMateria(req, res) {
+  const { materiasID, dia, hora_inicio, hora_fin } = req.body;
+  const mate = { materiasID };
+  req.getConnection((err, conn) => {
+    conn.query('INSERT INTO horarios SET ?', [mate], (err, materia) => {
+      if (err) {
+        res.json(err);
+      }
+      const idHorario = materia.insertId;
+      const horarios = [];
+      for (let i = 0; i < dia.length; i++) {
+        horarios.push([idHorario, dia[i], hora_inicio[i], hora_fin[i]]);
+      }
+      conn.query('INSERT INTO horariosdetalles (idHorario, dia, hora_inicio, hora_fin) VALUES ?', [horarios], (err, result) => {
+        if (err) {
+          res.json(err);
+        }
+        res.redirect('/horarios');
+      });
+    });
+  });
+}
+  /* antiguo
   function insertMateria(req, res) {
     let myVar = undefined;
     var {materiasID, horaInicioLunes, horaFinLunes, lunes, horaInicioMartes, horaFinMartes, martes, horaInicioMiercoles, horaFinMiercoles, miercoles, horaInicioJueves, horaFinJueves, jueves, horaInicioViernes, horaFinViernes, viernes } = req.body;
@@ -85,7 +136,7 @@ function index(req, res) {
       });
     });
   }
-
+*/
 
   function create(req, res) {
     res.render('tasks/create');
@@ -105,32 +156,45 @@ function index(req, res) {
     });
   }
  
+  
   async function asistencia ( req, res) { //Ver
     const {id} = req.params;
     const {materia} = req.params;
 
     console.log(materia, id)
 
-    const fecha = await pool.query('SELECT DISTINCT fecha FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND alumnoId = idAlum AND horaId = ?', [id])
-    const asist = await pool.query('SELECT DISTINCT email, nombre, apellido, fecha, presente FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND idAlum = alumnoId AND horaId = ? ', [id]);
     const nombreMat = await pool.query('SELECT nombreMateria FROM `materias` WHERE idMateria = ?', [materia]);
+   /* const fecha = await pool.query('SELECT DISTINCT fecha FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND alumnoId = idAlum AND horaId = ?', [id])
+    const asist = await pool.query('SELECT DISTINCT email, nombre, apellido, fecha, presente FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND idAlum = alumnoId AND horaId = ? ', [id]);
+    
 
 
     const asist5 = await pool.query('CALL PR_TABLA(?,?)', [id, materia]);
     const [asistZZ] = asist5;
     const keys = [...new Set(asistZZ.flatMap((content) => Object.keys(content)))];
-    const titleKeys = keys.map((key) => key.replace('_', '/'));
-    res.render('materias/asistencia', {asist, fecha, id,  asistZZ , titleKeys, keys, nombreMat});
+    const titleKeys = keys.map((key) => key.replace('_', '/'));*/
+    res.render('materias/asistencia',{nombreMat}); //res.render('horarios/asistencia', {asist, fecha, id,  asistZZ , titleKeys, keys, nombreMat});
   
   }
 
 
   async function inscriptos(req, res) {
     const {id} = req.params;
-    const alumnos = await pool.query('SELECT DISTINCT * FROM inscripciones, alumnos WHERE alumnoId = idAlum  AND materiaId = ?  ', [id]);
+    const alumnos = await pool.query('SELECT DISTINCT * FROM inscripciones, alumnos WHERE inscripciones.idAlumno = alumnos.id  AND inscripciones.materiaId = ?  ', [id]);
     const materias = await pool.query('SELECT DISTINCT * FROM materias WHERE  idMateria = ?', [id]);
-    const horarios = await pool.query('SELECT DISTINCT * FROM horarios, materias, profesores WHERE (materiasID = idMateria) AND (profeCargo = idProfe) AND materiasID = ?', [id])
-  
+    const horarios = await pool.query('SELECT DISTINCT * FROM horarios, materias, profesores,horariosdetalles WHERE (horarios.materiasID = materias.idMateria) AND (profeCargo = profesores.id) AND horarios.idhorarios = horariosdetalles.idHorario AND materiasID = ?', [id]);
+
+    const idHorariosArray = Array.from(new Set(horarios.map((row) => row.idhorarios)));
+    console.log(alumnos);
+
+    const conflicto = await pool.query(`SELECT m1.dia, m1.hora_inicio, m1.hora_fin, m1.idHorario as idHorario1, m2.idHorario as idHorario2, 
+    m2.idDetalle as idDetalle2 FROM horariosdetalles m1 JOIN horariosdetalles m2 ON (m1.idHorario <> m2.idHorario AND m1.dia = m2.dia)
+    WHERE ((m2.hora_inicio BETWEEN m1.hora_inicio AND m1.hora_fin) OR (m2.hora_fin BETWEEN m1.hora_inicio AND m1.hora_fin))
+    AND m1.idHorario = ? `,[idHorariosArray]);
+    console.log(conflicto);
+    
+
+
     switch (new Date().getDay()) {
         case 1:
 
@@ -140,7 +204,7 @@ function index(req, res) {
     }
 
     var alumitos = [];
-    
+    /*
     const horaIniPrincipalLunes = await pool.query('SELECT horaInicioLunes FROM `horarios` WHERE materiasID = ?', [id]);
     const horaIniFinLunes = await pool.query('SELECT horaFinLunes FROM `horarios` WHERE materiasID = ?', [id]);
 
@@ -233,9 +297,9 @@ function index(req, res) {
             alumnoId: alumnos[i].alumnoId,
             materiaId: alumnos[i].materiaId
         });
-    }
+    }*/
 
-    res.render('inscripcion/alumnosinscriptos',{alumnos, materias, alumitos, horarios});
+    res.render('inscripcion/alumnosinscriptos',{alumnos, materias, horarios,conflicto}); //,{alumnos, materias, alumitos, horarios}
   }
 
 
@@ -244,8 +308,9 @@ function index(req, res) {
     const {id} = req.params;
     console.log(id)
     const {materia} = req.params;
-  
-    const estado = await pool.query('SELECT valAlumno FROM inscripciones WHERE alumnoId = ? AND materiaId = ?  ', [id, materia]);
+    console.log(materia
+      )
+    const estado = await pool.query('SELECT valAlumno FROM inscripciones WHERE idAlumno = ? AND materiaId = ?  ', [id, materia]);
     const [estadosZ] = estado;
     if(estadosZ.valAlumno == "Invalido"){
         var cambiarEsta = {
@@ -257,8 +322,8 @@ function index(req, res) {
         }
     }
 
-    await pool.query('UPDATE inscripciones set ? WHERE alumnoId = ? AND materiaId = ?' , [cambiarEsta, id, materia ], );
-    res.redirect('/inscripcion/listarAlumnos/' + materia );
+    await pool.query('UPDATE inscripciones set ? WHERE idAlumno = ? AND materiaId = ?' , [cambiarEsta, id, materia ], );
+    res.redirect('/listarAlumnos/' + materia );
   
   }
 

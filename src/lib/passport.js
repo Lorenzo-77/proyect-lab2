@@ -76,12 +76,14 @@ passport.use('local.registrate', new LocalStrategy({
 }, async (req, email, password, done) => {
     const { nombre } = req.body;
     const { apellido } = req.body;
+    const { dni } = req.body;
     const { rol } = req.body;
     console.log(rol);
     if (rol == "alumno"){
     const newUser = {
         nombre,
         apellido,
+        dni,
         email,
         password,
         rol
@@ -89,13 +91,14 @@ passport.use('local.registrate', new LocalStrategy({
     };
     newUser.password = await helpers.encryptPassword(password);
     const result = await pool.query('INSERT INTO alumnos SET ?', [newUser]);
-    newUser.idAlum = result.insertId;
+    newUser.id = result.insertId;
     return  done(null, newUser);
 } else if ( rol == "profesor"){
 
     const newUser = {
         nombre,
         apellido,
+        dni,
         email,
         password,
         rol
@@ -103,12 +106,13 @@ passport.use('local.registrate', new LocalStrategy({
     };
     newUser.password = await helpers.encryptPassword(password);
     const result = await pool.query('INSERT INTO profesores SET ?', [newUser]);
-    newUser.idProfe = result.insertId;
+    newUser.id = result.insertId;
     return  done(null, newUser);
 } else {
     const newUser = {
         nombre,
         apellido,
+        dni,
         email,
         password,
         rol
@@ -116,7 +120,7 @@ passport.use('local.registrate', new LocalStrategy({
     };
     newUser.password = await helpers.encryptPassword(password);
     const result = await pool.query('INSERT INTO coordinadores SET ?', [newUser]);
-    newUser.idCoor = result.insertId;
+    newUser.id = result.insertId;
     return  done(null);
 }    
 }));
@@ -126,7 +130,7 @@ passport.use('local.registrate', new LocalStrategy({
 passport.serializeUser((user, done) =>{
     
   done(null, {
-      id: user.idAlum,
+      id: user.id,
       rol: user.rol,
       email: user.email
   });
@@ -134,7 +138,7 @@ passport.serializeUser((user, done) =>{
 
 passport.serializeUser((user, done) =>{
   done(null, {
-     id: user.idProfe,
+     id: user.id,
       rol: user.rol,
       email: user.email
   });
@@ -142,7 +146,7 @@ passport.serializeUser((user, done) =>{
 
 passport.serializeUser((user, done) =>{
   done(null, {
-      id: user.idCoor,
+      id: user.id,
        rol: user.rol,
        email: user.email
    });
@@ -173,18 +177,19 @@ passport.use('local.registrateProfe', new LocalStrategy({
   passwordField: 'password',
   passReqToCallback: true
 }, async (req, email, password, done)=>{
-  const {nombre,apellido, rol} =req.body;//tocar
+  const {nombre,apellido,dni, rol} =req.body;//tocar
 
   const newUser ={
     nombre,
     apellido,
+    dni,
     email,
     password,
     rol
   }
     newUser.password = await helpers.encryptPassword(password);
     const result = await pool.query('INSERT INTO profesores SET ?', [newUser]); //INSERT INTO profesores SET
-    newUser.idProfe = result.insertId;
+    newUser.id = result.insertId;
     return done(null);
      
 }));

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-03-2023 a las 03:09:57
+-- Tiempo de generación: 09-05-2023 a las 02:41:36
 -- Versión del servidor: 10.4.24-MariaDB
 -- Versión de PHP: 7.4.29
 
@@ -21,32 +21,6 @@ SET time_zone = "+00:00";
 -- Base de datos: `integrador`
 --
 
-DELIMITER $$
---
--- Procedimientos
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `PR_TABLA` (IN `P_HORARIO` INT, IN `P_MATERIA` INT)   BEGIN
-SET @sql = NULL;
-SELECT
-  GROUP_CONCAT(DISTINCT
-    CONCAT(
-      'max(case when fecha = ''', fecha, ''' then presente end) ', DATE_FORMAT(fecha, '%d_%m_%Y')
-    )
-  ) INTO @sql
-FROM
-  asistencias, inscripciones WHERE fecha IN (SELECT FECHA FROM asistencias WHERE horaId = P_HORARIO AND materiaId = P_MATERIA AND alumnoId = alumnoId);
-SET @sql = CONCAT('SELECT email, nombre, apellido, ', @sql, ' 
-                  FROM asistencias, alumnos, materias 
-			      WHERE idAlum = alumnoId AND materiaId = idMateria AND materiaId = ', P_MATERIA, ' 
-                   GROUP BY email');
-
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;	
-END$$
-
-DELIMITER ;
-
 -- --------------------------------------------------------
 
 --
@@ -54,11 +28,12 @@ DELIMITER ;
 --
 
 CREATE TABLE `alumnos` (
-  `idAlum` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `dni` varchar(20) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(50) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `password` varchar(150) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `rol` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -66,10 +41,12 @@ CREATE TABLE `alumnos` (
 -- Volcado de datos para la tabla `alumnos`
 --
 
-INSERT INTO `alumnos` (`idAlum`, `nombre`, `apellido`, `email`, `password`, `rol`) VALUES
-(1, 'David', 'Valdez', 'ivan@ulp.com', '$2a$10$Ep6h78mhSxp.In/lMmyvOeApQtf1XhlJPNnaPggLMwRNzv0zPLrwm', 'alumno'),
-(3, 'Fernando', 'Muñoz', 'fernando@gmail.com', '$2a$10$zTZ9Vs7y8.CivWW6d7ex9eF6YUf6Rf9Ub4axPwqJzIZhRIVckDC6u', 'alumno'),
-(4, 'Lorenzo', 'Muñoz', 'lorenzomuoz321@gmail.com', '$2a$10$Y/VcfY86D30MeGgb7dAfp.23Y8PHaXZjSX3KabfxqIh/I6Uk0dGK6', 'alumno');
+INSERT INTO `alumnos` (`id`, `dni`, `nombre`, `apellido`, `email`, `password`, `rol`) VALUES
+(1, '50505050', 'Samuel', 'Joya', 'joya@gmail.com', '$2a$10$dEW38abpA8pmiG3CBEFUq.TMkelKdj0FpjsUBm.OpFOTAqtALQC5y', 'alumno'),
+(2, '12345678', 'Ana', 'García', 'ana.garcia@gmail.com', '$2a$10$cXNC/g/iqFaYXHLjMS3JceAh.K/yn05uh3vIDqk1BhUOeBsZBrj.m', 'alumno'),
+(3, '2345678', 'Juan', 'Pérez', 'juan.perez@gmail.com', '$2a$10$TrPefVea623cueDsvM8/..cjlqosMwQrBQ2RGMsPBFzYvEfgd9Nyi', 'alumno'),
+(4, '34567890', 'María', 'Fernández', 'maria.fernandez@gmail.com', '$2a$10$8RRMGvcLGcDCSRN/xkK00OS3mYfqUY8rEhlcT/FjXbX4DtZvkVCaG', 'alumno'),
+(5, '45678901', ' Pedro', 'Sánchez', 'pedro.sanchez@gmail.com', '$2a$10$ncJnw.8pE.VPkzzffok3Qe5u5sDE71pQo9Osn9.5pBkf9TVnChn/a', 'alumno');
 
 -- --------------------------------------------------------
 
@@ -78,34 +55,15 @@ INSERT INTO `alumnos` (`idAlum`, `nombre`, `apellido`, `email`, `password`, `rol
 --
 
 CREATE TABLE `asistencias` (
-  `idAsistencia` int(20) NOT NULL,
-  `alumnoId` int(20) NOT NULL,
-  `horaId` int(20) NOT NULL,
-  `materiaId` int(20) DEFAULT NULL,
-  `presente` varchar(15) NOT NULL,
-  `fecha` date NOT NULL DEFAULT current_timestamp(),
-  `hora` time NOT NULL DEFAULT current_timestamp(),
-  `dictado` varchar(5) DEFAULT NULL
+  `idAsistencia` int(11) NOT NULL,
+  `alumnoId` int(11) NOT NULL,
+  `horaId` int(11) NOT NULL,
+  `materiaId` int(11) NOT NULL,
+  `presente` tinyint(1) NOT NULL,
+  `fecha` date NOT NULL,
+  `hora` time NOT NULL,
+  `dictado` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `asistencias`
---
-
-INSERT INTO `asistencias` (`idAsistencia`, `alumnoId`, `horaId`, `materiaId`, `presente`, `fecha`, `hora`, `dictado`) VALUES
-(1, 1, 8, 28, 'Si', '2023-02-09', '14:10:39', 'Si'),
-(2, 1, 4, 28, 'No', '2023-02-16', '00:00:00', 'Si'),
-(3, 3, 7, 27, 'Si', '2023-02-14', '22:12:42', 'No'),
-(4, 1, 3, 24, 'Si', '2023-02-06', '11:11:20', 'No'),
-(5, 1, 4, 25, 'Si', '2023-02-09', '16:23:04', 'Si'),
-(6, 3, 4, 24, 'Si', '2023-02-13', '12:19:35', 'Si'),
-(7, 3, 3, 24, 'Si', '2023-02-06', '11:06:03', 'Si'),
-(8, 3, 4, 25, 'Si', '2023-02-06', '12:06:40', 'Si'),
-(9, 4, 4, 25, 'No', '2023-02-06', '12:07:06', 'Si'),
-(10, 1, 7, 27, 'Si', '2023-02-07', '21:50:47', 'Si'),
-(11, 1, 3, 24, 'Si', '2023-02-15', '12:08:27', 'Si'),
-(12, 1, 3, 24, 'Si', '2023-02-10', '14:08:27', 'Si'),
-(13, 1, 4, 25, 'No', '2023-01-23', '14:08:27', 'si');
 
 -- --------------------------------------------------------
 
@@ -114,11 +72,12 @@ INSERT INTO `asistencias` (`idAsistencia`, `alumnoId`, `horaId`, `materiaId`, `p
 --
 
 CREATE TABLE `coordinadores` (
-  `idCoor` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `dni` varchar(20) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(50) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `password` varchar(150) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `rol` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -126,8 +85,29 @@ CREATE TABLE `coordinadores` (
 -- Volcado de datos para la tabla `coordinadores`
 --
 
-INSERT INTO `coordinadores` (`idCoor`, `nombre`, `apellido`, `email`, `password`, `rol`) VALUES
-(1, 'Lorenzo', 'Muñoz', 'Coordinador@gmail.com', '$2a$10$.gMCJmah.Ft0UYP/GgxFG./Km3kAdxJp3syO4I3yuKnno8zgJUIra', 'coordinador');
+INSERT INTO `coordinadores` (`id`, `dni`, `nombre`, `apellido`, `email`, `password`, `rol`) VALUES
+(1, '39796666', 'Lorenzo', 'Muñoz', 'Coordinador@gmail.com', '$2a$10$hMalpyylDjS5ekWveAvo7.g6.y.nf8ClN9bYCdB1PSghS7HAdDvju', 'coordinador');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `fechas`
+--
+
+CREATE TABLE `fechas` (
+  `idfechas` int(11) NOT NULL,
+  `materiaId` int(11) DEFAULT NULL,
+  `tipo_fecha` varchar(20) DEFAULT NULL,
+  `fecha_inicio` date DEFAULT NULL,
+  `fecha_fin` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `fechas`
+--
+
+INSERT INTO `fechas` (`idfechas`, `materiaId`, `tipo_fecha`, `fecha_inicio`, `fecha_fin`) VALUES
+(0, 14, 'cuatrimestre', '2023-05-15', '2023-09-14');
 
 -- --------------------------------------------------------
 
@@ -136,36 +116,38 @@ INSERT INTO `coordinadores` (`idCoor`, `nombre`, `apellido`, `email`, `password`
 --
 
 CREATE TABLE `horarios` (
-  `idHorarios` int(20) NOT NULL,
-  `materiasID` int(20) NOT NULL,
-  `horaInicioLunes` time DEFAULT NULL,
-  `horaFinLunes` time DEFAULT NULL,
-  `lunes` varchar(20) DEFAULT NULL,
-  `horaInicioMartes` time DEFAULT NULL,
-  `horaFinMartes` time DEFAULT NULL,
-  `martes` varchar(20) DEFAULT NULL,
-  `horaInicioMiercoles` time DEFAULT NULL,
-  `horaFinMiercoles` time DEFAULT NULL,
-  `miercoles` varchar(20) DEFAULT NULL,
-  `horaInicioJueves` time DEFAULT NULL,
-  `horaFinJueves` time DEFAULT NULL,
-  `jueves` varchar(20) DEFAULT NULL,
-  `horaInicioViernes` time DEFAULT NULL,
-  `horaFinViernes` time DEFAULT NULL,
-  `viernes` varchar(20) DEFAULT NULL
+  `idhorarios` int(11) NOT NULL,
+  `materiasID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `horarios`
 --
 
-INSERT INTO `horarios` (`idHorarios`, `materiasID`, `horaInicioLunes`, `horaFinLunes`, `lunes`, `horaInicioMartes`, `horaFinMartes`, `martes`, `horaInicioMiercoles`, `horaFinMiercoles`, `miercoles`, `horaInicioJueves`, `horaFinJueves`, `jueves`, `horaInicioViernes`, `horaFinViernes`, `viernes`) VALUES
-(3, 24, '11:00:00', '14:00:00', 'Lunes', NULL, NULL, NULL, '12:01:00', '16:01:00', 'Miercoles', NULL, NULL, NULL, '14:01:00', '18:00:00', 'Viernes'),
-(4, 25, '12:00:00', '15:00:00', 'Lunes', '10:00:00', '13:00:00', 'Martes', NULL, NULL, NULL, '16:00:00', '20:00:00', 'Jueves', NULL, NULL, NULL),
-(7, 27, NULL, NULL, NULL, '21:46:00', '22:46:00', 'Martes', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(8, 28, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '14:00:00', '17:00:00', 'Jueves', NULL, NULL, NULL),
-(10, 30, '08:20:00', '10:30:00', 'Lunes', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(11, 29, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '16:00:00', '19:25:00', 'Jueves', NULL, NULL, NULL);
+INSERT INTO `horarios` (`idhorarios`, `materiasID`) VALUES
+(14, 14);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `horariosdetalles`
+--
+
+CREATE TABLE `horariosdetalles` (
+  `idDetalle` int(11) NOT NULL,
+  `idHorario` int(11) NOT NULL,
+  `dia` varchar(50) NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `horariosdetalles`
+--
+
+INSERT INTO `horariosdetalles` (`idDetalle`, `idHorario`, `dia`, `hora_inicio`, `hora_fin`) VALUES
+(8, 14, 'Lunes', '14:00:00', '16:00:00'),
+(9, 14, 'Jueves', '15:00:00', '17:00:00');
 
 -- --------------------------------------------------------
 
@@ -174,28 +156,23 @@ INSERT INTO `horarios` (`idHorarios`, `materiasID`, `horaInicioLunes`, `horaFinL
 --
 
 CREATE TABLE `inscripciones` (
-  `idInscripcion` int(20) NOT NULL,
-  `alumnoId` int(20) NOT NULL,
-  `profesorId` int(20) NOT NULL,
-  `materiaId` int(20) NOT NULL,
-  `valAlumno` varchar(10) NOT NULL
+  `idInscripcion` int(11) NOT NULL,
+  `idAlumno` int(11) NOT NULL,
+  `idProfesor` int(11) NOT NULL,
+  `materiaId` int(11) NOT NULL,
+  `valAlumno` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `inscripciones`
 --
 
-INSERT INTO `inscripciones` (`idInscripcion`, `alumnoId`, `profesorId`, `materiaId`, `valAlumno`) VALUES
-(5, 1, 1, 24, 'Valido'),
-(6, 1, 1, 25, 'Valido'),
-(7, 1, 1, 26, 'Valido'),
-(8, 1, 1, 27, 'Valido'),
-(9, 3, 3, 28, 'Valido'),
-(10, 4, 1, 24, 'Valido'),
-(11, 4, 1, 25, 'Valido'),
-(12, 4, 1, 27, 'Valido'),
-(13, 1, 4, 30, 'Valido'),
-(14, 1, 4, 29, 'Valido');
+INSERT INTO `inscripciones` (`idInscripcion`, `idAlumno`, `idProfesor`, `materiaId`, `valAlumno`) VALUES
+(4, 1, 1, 14, 'Valido'),
+(5, 4, 1, 14, 'Valido'),
+(6, 2, 1, 14, 'Invalido'),
+(7, 3, 1, 14, 'Valido'),
+(9, 5, 1, 14, 'Valido');
 
 -- --------------------------------------------------------
 
@@ -205,22 +182,17 @@ INSERT INTO `inscripciones` (`idInscripcion`, `alumnoId`, `profesorId`, `materia
 
 CREATE TABLE `materias` (
   `idMateria` int(11) NOT NULL,
-  `nombreMateria` varchar(50) NOT NULL,
-  `profeCargo` int(11) DEFAULT NULL
+  `nombreMateria` varchar(100) NOT NULL,
+  `profeCargo` int(11) DEFAULT NULL,
+  `Año` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `materias`
 --
 
-INSERT INTO `materias` (`idMateria`, `nombreMateria`, `profeCargo`) VALUES
-(24, 'Base de datos', 1),
-(25, 'Android', 1),
-(26, 'Ingles', 1),
-(27, 'Ingenieria', 1),
-(28, 'Web 2', 3),
-(29, 'Matemática 2022', 4),
-(30, 'Sociales', 4);
+INSERT INTO `materias` (`idMateria`, `nombreMateria`, `profeCargo`, `Año`) VALUES
+(14, 'Matematica', 1, 2023);
 
 -- --------------------------------------------------------
 
@@ -229,11 +201,12 @@ INSERT INTO `materias` (`idMateria`, `nombreMateria`, `profeCargo`) VALUES
 --
 
 CREATE TABLE `profesores` (
-  `idProfe` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `dni` varchar(20) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(50) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `password` varchar(150) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `rol` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -241,10 +214,9 @@ CREATE TABLE `profesores` (
 -- Volcado de datos para la tabla `profesores`
 --
 
-INSERT INTO `profesores` (`idProfe`, `nombre`, `apellido`, `email`, `password`, `rol`) VALUES
-(1, 'Pedro', 'Blanco', 'pe@ulp.com', '$2a$10$q2l7bME3TWvabuudrVX0rOo9ljSmfmGv.2Aaxg4YFEKQq2hVQfIPe', 'profesor'),
-(3, 'Fernando', 'Saez', 'fe@gmail.com', '$2a$10$2ThGy3ZBXBsnMkZfV3nAmeh0J5BEyYFlpZJoSEHNuZEHYfOHn5eoa', 'profesor'),
-(4, 'Pedro', 'Blanco', 'pedro@gmail.com', '$2a$10$tqnXaeejhzmhhsFYQyhiT.sL0Wl.fUJUcdnaeXfwZ1XO/QRANw08a', 'profesor');
+INSERT INTO `profesores` (`id`, `dni`, `nombre`, `apellido`, `email`, `password`, `rol`) VALUES
+(1, '40404040', 'David', 'Lucero', 'david@gmail.com', '$2a$10$U3/J2J5BKNEg3h.loLrlHuWzSq1Y.DMF25tICXYabDVCE2t58Ff8O', 'profesor'),
+(2, '45293238', 'Diego', 'Funes', 'diego@gmail.com', '$2a$10$ljqbW1ruwnvRrCSA0wy2fevVbGTwZtGRC2y277wCOXJgyOdF7X0lu', 'profesor');
 
 -- --------------------------------------------------------
 
@@ -263,7 +235,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES
-('t_Lvzo4GbUH0kJp5PgFjU27J4cmRxoai', 1677722842, '{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"passport\":{\"user\":{\"rol\":\"coordinador\",\"email\":\"Coordinador@gmail.com\"}}}');
+('Du-DL_MZNC-QBKc-jLz1J8sN8_sV-wSz', 1683679261, '{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"passport\":{\"user\":{\"id\":1,\"rol\":\"profesor\",\"email\":\"david@gmail.com\"}}}');
 
 --
 -- Índices para tablas volcadas
@@ -273,14 +245,14 @@ INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES
 -- Indices de la tabla `alumnos`
 --
 ALTER TABLE `alumnos`
-  ADD PRIMARY KEY (`idAlum`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
   ADD PRIMARY KEY (`idAsistencia`),
-  ADD KEY `alumnoId` (`alumnoId`,`horaId`,`materiaId`),
+  ADD KEY `alumnoId` (`alumnoId`),
   ADD KEY `horaId` (`horaId`),
   ADD KEY `materiaId` (`materiaId`);
 
@@ -288,22 +260,36 @@ ALTER TABLE `asistencias`
 -- Indices de la tabla `coordinadores`
 --
 ALTER TABLE `coordinadores`
-  ADD PRIMARY KEY (`idCoor`);
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `fechas`
+--
+ALTER TABLE `fechas`
+  ADD PRIMARY KEY (`idfechas`),
+  ADD KEY `materiaId` (`materiaId`);
 
 --
 -- Indices de la tabla `horarios`
 --
 ALTER TABLE `horarios`
-  ADD PRIMARY KEY (`idHorarios`),
-  ADD UNIQUE KEY `materiasID` (`materiasID`);
+  ADD PRIMARY KEY (`idhorarios`),
+  ADD KEY `idmateria` (`materiasID`);
+
+--
+-- Indices de la tabla `horariosdetalles`
+--
+ALTER TABLE `horariosdetalles`
+  ADD PRIMARY KEY (`idDetalle`),
+  ADD KEY `idHorario` (`idHorario`);
 
 --
 -- Indices de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
   ADD PRIMARY KEY (`idInscripcion`),
-  ADD KEY `alumnoId` (`alumnoId`,`profesorId`,`materiaId`),
-  ADD KEY `profesorId` (`profesorId`),
+  ADD KEY `idAlumno` (`idAlumno`),
+  ADD KEY `idProfesor` (`idProfesor`),
   ADD KEY `materiaId` (`materiaId`);
 
 --
@@ -317,7 +303,7 @@ ALTER TABLE `materias`
 -- Indices de la tabla `profesores`
 --
 ALTER TABLE `profesores`
-  ADD PRIMARY KEY (`idProfe`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `sessions`
@@ -333,43 +319,49 @@ ALTER TABLE `sessions`
 -- AUTO_INCREMENT de la tabla `alumnos`
 --
 ALTER TABLE `alumnos`
-  MODIFY `idAlum` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  MODIFY `idAsistencia` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `idAsistencia` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `coordinadores`
 --
 ALTER TABLE `coordinadores`
-  MODIFY `idCoor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `horarios`
 --
 ALTER TABLE `horarios`
-  MODIFY `idHorarios` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `idhorarios` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `horariosdetalles`
+--
+ALTER TABLE `horariosdetalles`
+  MODIFY `idDetalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  MODIFY `idInscripcion` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `idInscripcion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `materias`
 --
 ALTER TABLE `materias`
-  MODIFY `idMateria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `idMateria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `profesores`
 --
 ALTER TABLE `profesores`
-  MODIFY `idProfe` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas
@@ -379,9 +371,15 @@ ALTER TABLE `profesores`
 -- Filtros para la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`alumnoId`) REFERENCES `inscripciones` (`alumnoId`),
-  ADD CONSTRAINT `asistencias_ibfk_2` FOREIGN KEY (`horaId`) REFERENCES `horarios` (`idHorarios`),
-  ADD CONSTRAINT `asistencias_ibfk_3` FOREIGN KEY (`materiaId`) REFERENCES `horarios` (`materiasID`);
+  ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`alumnoId`) REFERENCES `alumnos` (`id`),
+  ADD CONSTRAINT `asistencias_ibfk_2` FOREIGN KEY (`horaId`) REFERENCES `horarios` (`idhorarios`),
+  ADD CONSTRAINT `asistencias_ibfk_3` FOREIGN KEY (`materiaId`) REFERENCES `materias` (`idMateria`);
+
+--
+-- Filtros para la tabla `fechas`
+--
+ALTER TABLE `fechas`
+  ADD CONSTRAINT `fechas_ibfk_1` FOREIGN KEY (`materiaId`) REFERENCES `materias` (`idMateria`);
 
 --
 -- Filtros para la tabla `horarios`
@@ -390,18 +388,24 @@ ALTER TABLE `horarios`
   ADD CONSTRAINT `horarios_ibfk_1` FOREIGN KEY (`materiasID`) REFERENCES `materias` (`idMateria`);
 
 --
+-- Filtros para la tabla `horariosdetalles`
+--
+ALTER TABLE `horariosdetalles`
+  ADD CONSTRAINT `horariosdetalles_ibfk_1` FOREIGN KEY (`idHorario`) REFERENCES `horarios` (`idhorarios`);
+
+--
 -- Filtros para la tabla `inscripciones`
 --
 ALTER TABLE `inscripciones`
-  ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`profesorId`) REFERENCES `materias` (`profeCargo`),
-  ADD CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`materiaId`) REFERENCES `materias` (`idMateria`),
-  ADD CONSTRAINT `inscripciones_ibfk_3` FOREIGN KEY (`alumnoId`) REFERENCES `alumnos` (`idAlum`);
+  ADD CONSTRAINT `inscripciones_ibfk_1` FOREIGN KEY (`idAlumno`) REFERENCES `alumnos` (`id`),
+  ADD CONSTRAINT `inscripciones_ibfk_2` FOREIGN KEY (`idProfesor`) REFERENCES `profesores` (`id`),
+  ADD CONSTRAINT `inscripciones_ibfk_3` FOREIGN KEY (`materiaId`) REFERENCES `materias` (`idMateria`);
 
 --
 -- Filtros para la tabla `materias`
 --
 ALTER TABLE `materias`
-  ADD CONSTRAINT `materias_ibfk_1` FOREIGN KEY (`profeCargo`) REFERENCES `profesores` (`idProfe`);
+  ADD CONSTRAINT `materias_ibfk_1` FOREIGN KEY (`profeCargo`) REFERENCES `profesores` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

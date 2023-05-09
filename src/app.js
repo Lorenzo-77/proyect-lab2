@@ -40,12 +40,8 @@ app.engine('.hbs', engine({
 }));
 app.set('view engine', 'hbs');
 
-app.use(myconnection(mysql, {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'integrador' //to-do
-}, 'single'));
+app.use(myconnection(
+  mysql, database, 'single'));
 
 app.use(session({
   secret: 'secret',

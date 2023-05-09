@@ -1,5 +1,5 @@
-<div class="col-md-4 mx-auto ">
-    <div class="card text-center border-primary bg-dark mb-3">
+<div class="col-md-5 mx-auto ">
+    <div class="card text-center border-primary bg-dark ">
          <div class="card-header">
                 <h2 class="text-center">Agregar Horarios</h2><br>
                 <div class="card-body ">
@@ -11,44 +11,60 @@
                             {{#each materia}} <option value={{idMateria}}>{{nombreMateria}}</option>{{/each}}
                             </select>
                         </div>
+                        
                         <div class="input-group mb-3">    
-                            <span class="form-control input-group-text">Lunes &nbsp;   
-                                <input class="form-check-input" type="checkbox" id="cbLunes" name="lunes" value="Lunes">
+                            <span class="form-control input-group-text">
+                                <div class="form-check">
+                                    <input class="form-check-input d-none" type="checkbox" id="cbLunes" name="dia" value="Lunes">
+                                    <label class="form-check-label" for="cbLunes">Lunes</label>
+                                </div>
                             </span>         
-                            <input type="time" id="tiLunes" class="form-control" name="horaInicioLunes" min="9:00" max="20:00" disabled>
-                            <input type="time" id="tfLunes" class="form-control" name="horaFinLunes" min="10:00" max="22:00" disabled>
+                            <input type="time" id="tiLunes" class="form-control" name="hora_inicio" min="9:00" max="20:00" step="1800" list="inicio_tiempo" disabled>
+                            <input type="time" id="tfLunes" class="form-control" name="hora_fin" min="10:00" max="22:00" step="1800" list="fin_tiempo" disabled>
                         </div>
                             
                         <div class="input-group mb-3">    
-                            <span class="form-control input-group-text">Martes &nbsp;  
-                                <input class="form-check-input" type="checkbox" id="cbMartes" name="martes" value="Martes">
+                            <span class="form-control input-group-text">
+                                <div class="form-check">
+                                    <input class="form-check-input d-none" type="checkbox" id="cbMartes" name="dia" value="Martes">
+                                    <label class="form-check-label" for="cbMartes">Martes</label>
+                                </div>
                             </span>         
-                            <input type="time" id="tiMartes" class="form-control" name="horaInicioMartes" min="9:00" max="20:00" disabled>
-                            <input type="time" id="tfMartes" class="form-control" name="horaFinMartes" min="10:00" max="22:00" disabled>
+                            <input type="time" id="tiMartes" class="form-control" name="hora_inicio" min="9:00" max="20:00" step="1800" list="inicio_tiempo" disabled>
+                            <input type="time" id="tfMartes" class="form-control" name="hora_fin" min="10:00" max="22:00" step="1800" list="fin_tiempo" disabled>
                         </div>
                             
                         <div class="input-group mb-3">    
-                            <span class="form-control input-group-text">Mierco &nbsp;   
-                                <input class="form-check-input" type="checkbox" id="cbMiercoles" name="miercoles" value="Miercoles">
+                            <span class="form-control input-group-text">   
+                                <div class="form-check">
+                                    <input class="form-check-input d-none" type="checkbox" id="cbMiercoles" name="dia" value="Miercoles">
+                                    <label class="form-check-label" for="cbMiercoles">Miercoles</label>
+                                </div>
                             </span>         
-                            <input type="time" id="tiMiercoles" class="form-control" name="horaInicioMiercoles" min="9:00" max="20:00" disabled>
-                            <input type="time" id="tfMiercoles"  class="form-control" name="horaFinMiercoles" min="10:00" max="22:00" disabled>
+                            <input type="time" id="tiMiercoles" class="form-control" name="hora_inicio" min="9:00" max="20:00" step="1800" list="inicio_tiempo" disabled>
+                            <input type="time" id="tfMiercoles"  class="form-control" name="hora_fin" min="10:00" max="22:00" step="1800" list="fin_tiempo" disabled>
                         </div>
                             
                         <div class="input-group mb-3">    
-                            <span class="form-control input-group-text">Jueves &nbsp;  
-                                <input class="form-check-input" type="checkbox" id="cbJueves" name="jueves" value="Jueves">
+                            <span class="form-control input-group-text">
+                                <div class="form-check">
+                                    <input class="form-check-input d-none" type="checkbox" id="cbJueves" name="dia" value="Jueves">
+                                    <label class="form-check-label" for="cbJueves">Jueves</label>
+                                </div>
                             </span>         
-                            <input type="time" id="tiJueves" class="form-control" name="horaInicioJueves" min="9:00" max="20:00" disabled >
-                            <input type="time" id="tfJueves" class="form-control" name="horaFinJueves" min="10:00" max="22:00" disabled>
+                            <input type="time" id="tiJueves" class="form-control" name="hora_inicio" min="9:00" max="20:00" step="1800" list="inicio_tiempo" disabled >
+                            <input type="time" id="tfJueves" class="form-control" name="hora_fin" min="10:00" max="22:00" step="1800" list="fin_tiempo" disabled>
                         </div>
                             
                         <div class="input-group mb-3">    
-                            <span class="form-control input-group-text">Viernes &nbsp;
-                                <input class="form-check-input" type="checkbox" id="cbViernes" name="viernes" value="Viernes">
+                            <span class="form-control input-group-text">
+                                <div class="form-check">
+                                    <input class="form-check-input d-none" type="checkbox" id="cbViernes" name="dia" value="Viernes">
+                                    <label class="form-check-label" for="cbViernes">Viernes</label>
+                                </div>
                             </span>         
-                            <input type="time" id="tiViernes" class="form-control" name="horaInicioViernes" min="9:00" max="20:00" disabled>
-                            <input type="time" id="tfViernes" class="form-control" name="horaFinViernes" min="10:00" max="22:00" disabled>
+                            <input type="time" id="tiViernes" class="form-control" name="hora_inicio" min="9:00" max="20:00" step="1800" list="inicio_tiempo" disabled>
+                            <input type="time" id="tfViernes" class="form-control" name="hora_fin" min="10:00" max="22:00" step="1800" list="fin_tiempo" disabled>
                         </div>
                         <div class="form-group">
                             <input class="btn btn-success w-100" type="submit" value="Agregar Horario">
@@ -58,7 +74,58 @@
         </div>
     </div>
 </div>
-
+<datalist id="inicio_tiempo">
+  <option value="09:00">
+  <option value="09:30">
+  <option value="10:00">
+  <option value="10:30">
+  <option value="11:00">
+  <option value="11:30">
+  <option value="12:00">
+  <option value="12:30">
+  <option value="13:00">
+  <option value="13:30">
+  <option value="14:00">
+  <option value="14:30">
+  <option value="15:00">
+  <option value="15:30">
+  <option value="16:00">
+  <option value="16:30">
+  <option value="17:00">
+  <option value="17:30">
+  <option value="18:00">
+  <option value="18:30">
+  <option value="19:00">
+  <option value="19:30">
+  <option value="20:00">
+</datalist>
+<datalist id="fin_tiempo">
+  <option value="10:00">
+  <option value="10:30">
+  <option value="11:00">
+  <option value="11:30">
+  <option value="12:00">
+  <option value="12:30">
+  <option value="13:00">
+  <option value="13:30">
+  <option value="14:00">
+  <option value="14:30">
+  <option value="15:00">
+  <option value="15:30">
+  <option value="16:00">
+  <option value="16:30">
+  <option value="17:00">
+  <option value="17:30">
+  <option value="18:00">
+  <option value="18:30">
+  <option value="19:00">
+  <option value="19:30">
+  <option value="20:00">
+  <option value="20:30">
+  <option value="21:00">
+  <option value="21:30">
+  <option value="22:00">
+</datalist>
 <script>
 
     document.getElementById('cbLunes').onchange = function() {

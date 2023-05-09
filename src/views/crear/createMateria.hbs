@@ -6,10 +6,28 @@
     </div>
     <div class="card-body ">
         <form action="" method="post">
-        <div class="input-group mb-3">
+        <div class="input-group mb-3 " >
             <input type="text"  name="nombreMateria" class="form-control" placeholder="Materia" autofocus required>
+            <input type="text" name="Año" id="year-input" hidden>
         </div>
-                
+
+        <div class="input-group mb-3">
+           <span class="form-control">Duracion</span> 
+           <select id="periodo" name="tipo_fecha"  class="form-control">
+            <option value="anual">Anual</option>
+             <option value="semestre">Semestre</option>
+             <option value="cuatrimestre">Cuatrimestre</option>
+             <option value="trimestre">Trimestre</option>
+             <option value="bimestre">Bimestre</option>
+             </select>
+        </div>     
+        <!--  ('Anuales', 9),('Semestrales', 6),('Cuatrimestrales', 4),('Trimestrales', 3),('Bimestrales', 2); -->
+        <div class="input-group mb-3">
+           <span class="form-control">Inicio</span>  <input type="date" name="fecha_inicio" value=""  class="form-control"/>
+        </div>     
+        <div class="input-group mb-3">
+           <span class="form-control">Fin</span> <input type="date"  name="fecha_fin" value=""  class="form-control" readonly/>
+        </div>      
         <div class="form-group">
             <button class="btn btn-primary btn-block" type="submit">
                 Guardar
@@ -19,3 +37,39 @@
     </div>
 </div>
 </div>
+
+<script>
+const yearInput = document.getElementById('year-input');
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+yearInput.value = currentYear;
+
+document.getElementsByName("fecha_inicio")[0].addEventListener("input", function() {
+
+  var tipo_fecha = document.getElementById("periodo").value;
+  var fecha_inicio = new Date(document.getElementsByName("fecha_inicio")[0].value);
+  var fecha_fin = new Date(fecha_inicio);
+  switch (tipo_fecha) {
+    case "anual":
+      fecha_fin.setMonth(fecha_fin.getMonth() + 9);
+      break;
+    case "semestre":
+      fecha_fin.setMonth(fecha_fin.getMonth() + 6);
+      break;
+    case "cuatrimestre":
+      fecha_fin.setMonth(fecha_fin.getMonth() + 4);
+      break;
+    case "trimestre":
+      fecha_fin.setMonth(fecha_fin.getMonth() + 3);
+      break;
+    case "bimestre":
+      fecha_fin.setMonth(fecha_fin.getMonth() + 2);
+      break;
+  }
+  var yyyy = fecha_fin.getFullYear().toString();
+  var mm = (fecha_fin.getMonth()+1).toString().padStart(2, '0');
+  var dd  = fecha_fin.getDate().toString().padStart(2, '0');
+  var fecha_fin_str = yyyy + '-' + mm + '-' + dd;
+  document.getElementsByName("fecha_fin")[0].value = fecha_fin_str;
+});
+</script>

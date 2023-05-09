@@ -1,6 +1,6 @@
 <div class="container p-4">
     <div class="row">
-        {{#each horario}}
+        {{#each materiasArr}}
              <div class="col md-3">
                  <div class="card text-center">
                      <div class="card-body ">
@@ -10,13 +10,10 @@
                          </a>
                          
                          <p class="m-2 text-success">Profesor {{nombre}} {{apellido}}</p>
-                         <p class="m-2">{{lunes}} {{horaInicioLunes}}  {{horaFinLunes}}</p>
-                         <p class="m-2">{{martes}} {{horaInicioMartes}}  {{horaFinMartes}}</p>
-                         <p class="m-2">{{miercoles}} {{horaInicioMiercoles}}  {{horaFinMiercoles}}</p>
-                         <p class="m-2 ">{{jueves}} {{horaInicioJueves}}  {{horaFinJueves}}</p>
-                         <p class="m-2">{{viernes}} {{horaInicioViernes}}  {{horaFinViernes}}</p>
-                      
-                         <a href="/asistencia/agregarAsistencia/{{idHorarios}}" class="btn btn-outline-light">Asistencia</a>
+                            {{#each horarios}}
+        <p class="m-2">{{dia}} {{hora_inicio}} {{hora_fin}}</p>   
+      {{/each}}
+                         <a href="/asistencia/agregarAsistencia/{{idhorarios}}" class="btn btn-outline-dark">Asistencia</a>
                     
 
                      </div>
