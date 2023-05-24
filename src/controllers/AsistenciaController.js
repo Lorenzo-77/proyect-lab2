@@ -32,359 +32,96 @@ function index(req, res) {
         });
         return acc;
       }, {});
+  
       const materiasArr = Object.values(materias);
+      console.log(materiasArr)
       res.render('materias/listaAsistencias', { materiasArr });
     });
   });
 }
 
-function contadorDias(){
-  const horaActual = new Date();
-  var horaProgramada = new Date();
-  horaProgramada.setHours(00);
-  horaProgramada.setMinutes(00);
-  horaProgramada.setSeconds(00);
-  const x = horaProgramada.getTime() - horaActual.getTime();
-  console.log(horaProgramada);
-  console.log(horaActual);
-  console.log(Math.abs(x))
-  return Math.abs(x);
-}   
-
-
-async function cargaAsistencias() {
-  console.log("cargaAsistencia")
-   switch (new Date().getDay()) {
-       case 1:
-           const luneshorarios = await pool.query('SELECT idHorarios, alumnoId, materiaId FROM  horarios ,inscripciones WHERE materiaId = materiasID AND lunes = Lunes ');
-           let luneslength = luneshorarios.length;
-           x = 0  
-           do{
-               
-               const nuevaInscripcion = {
-                   alumnoId: luneshorarios[x].alumnoId,
-                   horaId: luneshorarios[x].idHorarios,
-                   materiaId: luneshorarios[x].materiasID,
-                   presente:  "No",
-                   dictado: "Si"
-               }
-           
-               await pool.query('INSERT INTO asistencias set ?' , [nuevaInscripcion]);
-           
-               x = x + 1
-           }while (x < luneslength)      
-
-       break;
-       
-       case 2:
-           const marteshorarios = await pool.query('SELECT idHorarios, alumnoId, materiaId FROM  horarios ,inscripciones WHERE materiaId = materiasID AND martes = Martes ');
-           let marteslength = marteshorarios.length;
-           x = 0  
-           do{
-               
-               const nuevaInscripcion = {
-                   alumnoId: marteshorarios[x].alumnoId,
-                   horaId: marteshorarios[x].idHorarios,
-                   materiaId: marteshorarios[x].materiasID,
-                   presente:  "No",
-                   dictado: "Si"
-               }
-           
-               await pool.query('INSERT INTO asistencias set ?' , [nuevaInscripcion]);
-           
-               x = x + 1
-           }while (x < marteslength)      
-
-       break;
-
-       case 3:
-           const miercoleshorarios = await pool.query('SELECT idHorarios, alumnoId, materiaId FROM  horarios ,inscripciones WHERE materiaId = materiasID AND miercoles = Miercoles ');
-           let miercoleslength = miercoleshorarios.length;
-           x = 0  
-           do{
-               
-               const nuevaInscripcion = {
-                   alumnoId: miercoleshorarios[x].alumnoId,
-                   horaId: miercoleshorarios[x].idHorarios,
-                   materiaId: miercoleshorarios[x].materiasID,
-                   presente:  "No",
-                   dictado: "Si"
-               }
-           
-               await pool.query('INSERT INTO asistencias set ?' , [nuevaInscripcion]);
-           
-               x = x + 1
-           }while (x < miercoleslength)      
-
-       break;
-   
-       case 4:
-           const jueveshorarios = await pool.query('SELECT idHorarios, alumnoId, materiaId FROM  horarios ,inscripciones WHERE materiaId = materiasID AND jueves = Jueves ');
-           let jueveslength = jueveshorarios.length;
-           x = 0  
-           do{
-               
-               const nuevaInscripcion = {
-                   alumnoId: jueveshorarios[x].alumnoId,
-                   horaId: jueveshorarios[x].idHorarios,
-                   materiaId: jueveshorarios[x].materiasID,
-                   presente:  "No",
-                   dictado: "Si"
-               }
-           
-               await pool.query('INSERT INTO asistencias set ?' , [nuevaInscripcion]);
-           
-               x = x + 1
-           }while (x < jueveslength)      
-
-       break;
-
-       case 5:
-           const vierneshorarios = await pool.query('SELECT idHorarios, alumnoId, materiaId FROM  horarios ,inscripciones WHERE materiaId = materiasID AND viernes = Viernes ');
-           let vierneslength = vierneshorarios.length;
-           x = 0  
-           do{
-               
-               const nuevaInscripcion = {
-                   alumnoId: vierneshorarios[x].alumnoId,
-                   horaId: vierneshorarios[x].idHorarios,
-                   materiaId: vierneshorarios[x].materiasID,
-                   presente:  "No",
-                   dictado: "Si"
-               }
-           
-               await pool.query('INSERT INTO asistencias set ?' , [nuevaInscripcion]);
-           
-               x = x + 1
-           }while (x < vierneslength)      
-
-       break;
-               
-       default:  
-           console.log("SABADO");
-           console.log(contadorDias());
-       
-           
-}
-
-}
-
-function  preguntaTiempo(){
-  const horaActual = new Date();
-  var horaProgramada = new Date();
-  horaProgramada.setHours(00);
-  horaProgramada.setMinutes(00);
-  horaProgramada.setSeconds(00);
-  const x = horaProgramada.getTime() - horaActual.getTime();
-      if (x == 0){
-          clearTimeout(asistenciaCargada)
-          clearInterval(intervaloTiempo)
-          setTimeout( cargaAsistencias , contadorDias());
-
-          setInterval(preguntaTiempo, 1000)
-         
-      }
-
-} 
-var intervaloTiempo = setInterval(preguntaTiempo, 1000);
-
-asistenciaCargada =setTimeout( cargaAsistencias , contadorDias());
-
-
 async function asistencia(req,res){
     var ahora = moment();
     ahora.format('HH:mm');
+    const fechaHoy = new Date();
     const {id} = req.params;
-    const horarios = await pool.query('SELECT DISTINCT alumnoId, idHorarios FROM inscripciones, horarios WHERE alumnoId = ? AND idHorarios = ?', [req.user.idAlum, id])
-    const [horaZ] = horarios;
-    const nuevaInscripcion = {
+    const horarios = await pool.query(`SELECT DISTINCT hora_inicio FROM inscripciones, horarios, horariosdetalles
+    WHERE idAlumno = ? AND idHorarios = idhorario AND idhorarios = ?`, [req.user.id, id])
+    console.log(horarios)
+
+    const horario = horarios.find(horario => horario.idhorarios === id);
+    const horaInicio = moment(horarios, 'HH:mm:ss');
+    console.log(horaInicio);
+    
+    const hora = moment();
+    const tiempoLimite = horaInicio.clone().add(30, 'minutes'); // Sumar 30 minutos a la hora de inicio
+    console.log(hora);
+
+    const dias = await pool.query(`SELECT DISTINCT DATE_ADD(fecha_inicio, INTERVAL n.num DAY) AS fecha 
+    FROM fechas 
+    INNER JOIN materias ON fechas.materiaId = materias.idMateria 
+    INNER JOIN horariosdetalles ON horariosdetalles.idHorario = materias.idMateria
+    CROSS JOIN (
+        SELECT a.N + b.N * 10 + c.N * 100 + d.N * 1000 AS num
+        FROM (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+            (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b,
+            (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c,
+            (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) d
+    ) n 
+    WHERE materias.idMateria = ?
+        AND DATE_ADD(fecha_inicio, INTERVAL n.num DAY) BETWEEN fecha_inicio AND fecha_fin
+        AND (
+            (horariosdetalles.dia = 'lunes' AND DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 2)
+            OR (horariosdetalles.dia = 'martes' AND DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 3)
+            OR (horariosdetalles.dia = 'miércoles' AND DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 4)
+            OR (horariosdetalles.dia = 'jueves' AND DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 5)
+            OR (horariosdetalles.dia = 'viernes' AND DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 6)
+        )
+    `, [id]);
+
+      let fechaDias;
+
+      for (let i = 0; i < dias.length; i++) {
+         fechaDias = new Date(dias[i].fecha);
+         //console.log(fechaDias)
+        if (fechaDias.toISOString().substring(0, 10) === fechaHoy.toISOString().substring(0, 10)) {
+          console.log("La fecha coincide con la fecha actual.");
+          fechaDias = fechaDias;
+          break // Guardar la fecha coincidente en la variable
+        } 
+      }
+       
+      const nuevaAsistencia = {
+        alumnoId: req.user.id,
+        horaId: id ,
+        materiaId: id,
         hora: ahora.format("HH:mm:ss"),
-        presente:  "Si"
-    }
+        presente: "Si",
+        fecha: fechaHoy,
+        dictado: "Si"
+      };  
+     
+      console.log(fechaHoy,fechaDias)
 
-    const  des  =  new Date();
-    
-    const dias = await pool.query  ('SELECT DISTINCT lunes,martes,miercoles,jueves,viernes FROM horarios WHERE idHorarios = ? ' , [id])
-    const [diaZ] = dias;
-    let dia;
-    
-switch (new Date().getDay()) {
-  case 1:
-    dia = "Lunes";
+      if (hora.isBefore(tiempoLimite)) {
+        console.log("Hola")
+      }
+      if (fechaDias.toISOString().substring(0, 10) === fechaHoy.toISOString().substring(0, 10)) { // La fecha del día coincide con el día de hoy
+        req.getConnection((err, conn) => {
+            conn.query('INSERT INTO asistencias SET ?', [nuevaAsistencia], (err, rows) => {
+              res.redirect('/asistencia?=La fecha del día SI coincide con el día de hoy');
+            });
+          });
+        console.log('Hoy es el día que buscas');
 
-    var hor =  await pool.query('SELECT DISTINCT horaInicioLunes, horaFinLunes FROM inscripciones, horarios WHERE alumnoId = ? AND idHorarios = ?', [req.user.idAlum, id] )
-    var [horZ] = hor
-    var  arr = horZ.horaInicioLunes.split(":")
-    var base = moment(des.setHours(arr[0], arr[1], arr[2]))
-    var mas30 = moment(des.setHours(arr[0], arr[1], arr[2]));
-    mas30.add(30, 'm')
+      } else // La fecha del día no coincide con el día de hoy
+      {  
 
-   
-    if( dia == diaZ.lunes){
-        console.log(ahora);
-        console.log(base);
-        console.log(mas30);
-        if ( ahora > base && ahora < mas30){
-            
-            const condi = await pool.query ('SELECT DISTINCT IF(alumnoId= ? AND horaId = ? AND horaId = idHorarios AND presente = "Si" AND fecha = ? , "YES", "NO") AS condi FROM asistencias, horarios ORDER BY condi DESC LIMIT 1 ', [horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")])
-            const [con] =  condi
+        console.log('La fecha del día no coincide con el día que buscas');
+        res.redirect('/asistencia?=La fecha del día NO coincide con el día que buscas');
+        
+      }
 
-            console.log(condi);
-            console.log(con);
-            if(con.condi == "YES"){
-                res.redirect('/asistencia');    
-            }  
-            else {
-                    await pool.query('UPDATE asistencias set ? WHERE alumnoId=? AND horaId=? AND fecha=? ' , [nuevaInscripcion,horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")]);
-                    res.redirect('/asistencia');
-                 }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-
-        }
-        else  {
-            res.redirect('/asistencia');
-        }
-    break;
-  case 2:
-     dia = "Martes";
-    
-     var hor =  await pool.query('SELECT DISTINCT horaInicioMartes, horaFinMartes FROM inscripciones, horarios WHERE alumnoId = ? AND idHorarios = ?', [req.user.idAlum, id] )
-     console.log(hor)
-     var [horZ] = hor;
-     console.log(horZ)
-     var  arr = horZ.horaInicioMartes.split(":");
-     var base = moment(des.setHours(arr[0], arr[1], arr[2]));
-     var mas30 = moment(des.setHours(arr[0], arr[1], arr[2]));
-     mas30.add(30, 'm')
-
-
-    if( dia == diaZ.martes){
-        if ( ahora > base && ahora < mas30){
-
-            const condi = await pool.query ('SELECT DISTINCT IF(alumnoId = ? AND horaId = ? AND horaId = idHorarios AND presente = "Si" AND fecha = ? , "YES", "NO") AS condi FROM asistencias, horarios ORDER BY condi DESC LIMIT 1 ', [horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")])
-            const [con] =  condi;
-            console.log(condi)
-            if(con.condi == "YES"){
-                res.redirect('/asistencia');    
-            }else{
-          
-            await pool.query('UPDATE asistencias set ? WHERE alumnoId=? AND horaId=? AND fecha=? ' , [nuevaInscripcion,horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")]);
-            res.redirect('/asistencia');
-            }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    break;
-  case 3:
-    dia = "Miercoles";
-
-    var hor =  await pool.query('SELECT DISTINCT horaInicioMiercoles, horaFinMiercoles FROM inscripciones, horarios WHERE alumnoId = ? AND idHorarios = ?', [req.user.idAlum, id] )
-    var [horZ] = hor
-    var  arr = horZ.horaInicioMiercoles.split(":")
-    var base = moment(des.setHours(arr[0], arr[1], arr[2]))
-    var mas30 = moment(des.setHours(arr[0], arr[1], arr[2]));
-    mas30.add(30, 'm')
-
-    if( dia == diaZ.miercoles){
-        if ( ahora > base && ahora < mas30){
-
-            const condi = await pool.query ('SELECT DISTINCT IF(alumnoId = ? AND horaId = ? AND horaId = idHorarios AND presente = "Si" AND fecha = ? , "YES", "NO") AS condi FROM asistencias, horarios ORDER BY condi DESC LIMIT 1 ', [horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")])
-            const [con] =  condi
-            if(con.condi == "YES"){
-                res.redirect('/asistencia');    
-            }else{
-          
-            await pool.query('UPDATE asistencias set ? WHERE alumnoId=? AND horaId=? AND fecha=? ' , [nuevaInscripcion,horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")]);
-            res.redirect('/asistencia');
-            }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    break;
-  case 4:
-    dia = "Jueves";
-    
-    var hor =  await pool.query('SELECT DISTINCT horaInicioJueves, horaFinJueves FROM inscripciones, horarios WHERE alumnoId = ? AND idHorarios = ?', [req.user.idAlum, id] )
-    var [horZ] = hor
-    var  arr = horZ.horaInicioJueves.split(":")
-    var base = moment(des.setHours(arr[0], arr[1], arr[2]))
-    var mas30 = moment(des.setHours(arr[0], arr[1], arr[2]));
-    mas30.add(30, 'm')
-
-
-    if( dia == diaZ.jueves){
-        console.log(ahora);
-        console.log(base);
-        console.log(mas30);
-        if ( ahora > base && ahora < mas30){
-
-        const condi = await pool.query ('SELECT DISTINCT IF(alumnoId = ? AND horaId = ? AND horaId = idHorarios AND presente = "Si" AND fecha = ? , "YES", "NO") AS condi FROM asistencias, horarios ORDER BY condi DESC LIMIT 1 ', [horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")])
-        const [con] =  condi
-        if(con.condi == "YES"){
-            res.redirect('/asistencia');    
-        }else{
-      
-        await pool.query('UPDATE asistencias set ? WHERE alumnoId=? AND horaId=? AND fecha=? ' , [nuevaInscripcion,horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")]);
-        res.redirect('/asistencia');
-        }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    break;
-  case 5:
-    dia = "Viernes";
-
-    var hor =  await pool.query('SELECT DISTINCT horaInicioViernes, horaFinViernes FROM inscripciones, horarios WHERE alumnoId = ? AND idHorarios = ?', [req.user.idAlum, id] )
-    var [horZ] = hor
-    var  arr = horZ.horaInicioViernes.split(":")
-    var base = moment(des.setHours(arr[0], arr[1], arr[2]))
-    var mas30 = moment(des.setHours(arr[0], arr[1], arr[2]));
-    mas30.add(30, 'm')
-
-
-    if( dia == diaZ.viernes){
-        if ( ahora > base && ahora < mas30){
-
-            const condi = await pool.query ('SELECT DISTINCT IF(alumnoId = ? AND horaId = ? AND horaId = idHorarios AND presente = "Si" AND fecha = ? , "YES", "NO") AS condi FROM asistencias, horarios ORDER BY condi DESC LIMIT 1 ', [horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")])
-            const [con] =  condi
-            if(con.condi == "YES"){
-                res.redirect('/asistencia');    
-            }else{
-          
-            await pool.query('UPDATE asistencias set ? WHERE alumnoId=? AND horaId=? AND fecha=? ' , [nuevaInscripcion,horaZ.alumnoId, horaZ.idHorarios, ahora.format("YYYY-MM-DD")]);
-            res.redirect('/asistencia');
-            }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    }
-    else  {
-        res.redirect('/asistencia');
-    }
-    break;
-  default:  
-    res.redirect('/asistencia');
-}
 }
 
 
@@ -392,5 +129,4 @@ switch (new Date().getDay()) {
   module.exports = {
     index: index,
     asistencia:asistencia,
-
   }

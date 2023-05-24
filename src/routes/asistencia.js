@@ -9,7 +9,7 @@ routerAsistencia.get('/', (req, res) => {
 
 routerAsistencia.get('/asistencia',isLoggedIn, AsistenciaController.index);
 
-routerAsistencia.get('/asistencia/agregarAsistencia/:id',isLoggedIn, AsistenciaController.asistencia);
+routerAsistencia.get('/agregarAsistencia/:id',isLoggedIn, AsistenciaController.asistencia);
 
 
 

@@ -2,7 +2,7 @@
     <div class="row">
 
 {{#each materiasArr}}
-  <div class="card text-center text-white bg-secondary mb-4">
+  <div class="card text-center text-white bg-gradient-secondary  mb-4">
     <div class="card-body">
       <h3 class="card-title text-uppercase">
         {{nombreMateria}}
@@ -13,8 +13,8 @@
       {{/each}}
 
       <div class="btn-group" role="group" aria-label="Basic example">
-        <a href="/asistencia/{{idhorarios}}/{{idMateria}}" class="btn btn-outline-light">Asistencias</a>
-        <a href="/listarAlumnos/{{idMateria}}" class="btn btn-outline-dark">Inscriptos</a>
+        <a href="/asistencia/{{idhorarios}}/{{idMateria}}" class="btn bg-gradient-info text-gray-100">Asistencias</a>
+        <a href="/listarAlumnos/{{idMateria}}" class="btn bg-gradient-success text-gray-100">Inscriptos</a>
       </div>
     </div>
   </div>

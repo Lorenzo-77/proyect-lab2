@@ -1,8 +1,9 @@
+
 <div class="container p-4">
     <div class="row">
         {{#each materiasArr}}
-             <div class="col md-3">
-                 <div class="card text-center">
+             <div class="col md-3 ">
+                 <div class="card text-center border-left-success border-bottom-success">
                      <div class="card-body ">
                              <h3 class="card-title text-uppercase text-info">
                                  {{nombreMateria}}
@@ -11,14 +12,15 @@
                          
                          <p class="m-2 text-success">Profesor {{nombre}} {{apellido}}</p>
                             {{#each horarios}}
-        <p class="m-2">{{dia}} {{hora_inicio}} {{hora_fin}}</p>   
-      {{/each}}
-                         <a href="/asistencia/agregarAsistencia/{{idhorarios}}" class="btn btn-outline-dark">Asistencia</a>
+                               <p class="m-2">{{dia}} {{hora_inicio}} {{hora_fin}}</p>   
+                            {{/each}}
+                         <a href="/agregarAsistencia/{{idhorarios}}" class="btn bg-gradient-primary text-gray-100">Asistencia</a>
                     
 
                      </div>
                  </div>
              </div>
+
         {{else}}  
             <div class="col-md-4 mx-auto">
                 <div class="card card-body text-center">
@@ -27,5 +29,7 @@
                 </div>
             </div>
         {{/each}}
+
+
     </div>
 </div>

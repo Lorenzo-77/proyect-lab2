@@ -7,7 +7,7 @@
 
                         <div class="input-group mb-3">
                             <span class="form-control input-group-text">Materia</span>
-                            <select name="materiasID" class="form-select">
+                            <select name="materiasID" class="form-select bg-gradient-info text-gray-100">
                             {{#each materia}} <option value={{idMateria}}>{{nombreMateria}}</option>{{/each}}
                             </select>
                         </div>
@@ -67,7 +67,7 @@
                             <input type="time" id="tfViernes" class="form-control" name="hora_fin" min="10:00" max="22:00" step="1800" list="fin_tiempo" disabled>
                         </div>
                         <div class="form-group">
-                            <input class="btn btn-success w-100" type="submit" value="Agregar Horario">
+                            <input class="btn btn-success w-100 bg-gradient-success" type="submit" value="Agregar Horario">
                         </div>
                     </form>
                 </div>

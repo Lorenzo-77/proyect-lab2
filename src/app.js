@@ -4,6 +4,7 @@ const myconnection = require('express-myconnection');
 const path = require('path');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
+const flash = require('connect-flash-plus');
 const session = require('express-session');
 const passport = require('passport');
 const morgan = require('morgan');
@@ -41,7 +42,7 @@ app.engine('.hbs', engine({
 app.set('view engine', 'hbs');
 
 app.use(myconnection(
-  mysql, database, 'single'));
+  mysql, database, 'single')); //conexion a la base de datos
 
 app.use(session({
   secret: 'secret',
@@ -52,8 +53,11 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
-app.use((req,res,next)=>{
+app.use((req,res,next)=>{               //Variables Globales
+  app.locals.success = req.flash('success');
+  app.locals.message = req.flash('message');
 	app.locals.user = req.user;
 	next();
 });

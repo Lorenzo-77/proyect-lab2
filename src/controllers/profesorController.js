@@ -162,18 +162,42 @@ function insertMateria(req, res) {
     const {materia} = req.params;
 
     console.log(materia, id)
+/*SELECT * 
+
+FROM fechas 
+JOIN materias ON fechas.materiaId = materias.idMateria 
+JOIN horarios ON materias.idMateria = horarios.materiasID 
+JOIN horariosdetalles ON horarios.idhorarios = horariosdetalles.idHorario 
+WHERE materias.idMateria = 14 
+AND horariosdetalles.dia IN ('lunes', 'jueves') 
+AND fechas.tipo_fecha = 'cuatrimestre' 
+AND fechas.fecha_inicio = '2023-05-15' 
+AND fechas.fecha_fin = '2023-09-14';
+ Importante*/
 
     const nombreMat = await pool.query('SELECT nombreMateria FROM `materias` WHERE idMateria = ?', [materia]);
-   /* const fecha = await pool.query('SELECT DISTINCT fecha FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND alumnoId = idAlum AND horaId = ?', [id])
-    const asist = await pool.query('SELECT DISTINCT email, nombre, apellido, fecha, presente FROM asistencias, horarios, alumnos WHERE horaId = idHorarios AND idAlum = alumnoId AND horaId = ? ', [id]);
+    const fechas = await pool.query(`SELECT DISTINCT DATE_ADD(fecha_inicio, INTERVAL n.num DAY) AS fecha 
+    FROM fechas INNER JOIN materias ON fechas.materiaId = materias.idMateria 
+    INNER JOIN horariosdetalles ON horariosdetalles.idHorario = materias.idMateria
+    CROSS JOIN (
+        SELECT a.N + b.N * 10 + c.N * 100 + d.N * 1000 AS num
+         FROM (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a,
+              (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b,
+              (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) c,
+              (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) d
+    ) n WHERE materias.idMateria = ?
+        AND DATE_ADD(fecha_inicio, INTERVAL n.num DAY) BETWEEN fecha_inicio AND fecha_fin
+      AND (DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 2 OR DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 5)`, [materia]);
+
+    const asist = await pool.query('SELECT DISTINCT email, nombre, apellido, fecha, presente FROM asistencias, horarios, alumnos WHERE asistencias.horaId = horarios.idhorarios AND alumnos.id = asistencias.alumnoId AND idhorarios = ? ', [id]);
     
 
-
+/*
     const asist5 = await pool.query('CALL PR_TABLA(?,?)', [id, materia]);
     const [asistZZ] = asist5;
     const keys = [...new Set(asistZZ.flatMap((content) => Object.keys(content)))];
     const titleKeys = keys.map((key) => key.replace('_', '/'));*/
-    res.render('materias/asistencia',{nombreMat}); //res.render('horarios/asistencia', {asist, fecha, id,  asistZZ , titleKeys, keys, nombreMat});
+    res.render('materias/asistencia',{nombreMat,fechas}); //res.render('horarios/asistencia', {asist, fecha, id,  asistZZ , titleKeys, keys, nombreMat});
   
   }
 
@@ -185,13 +209,13 @@ function insertMateria(req, res) {
     const horarios = await pool.query('SELECT DISTINCT * FROM horarios, materias, profesores,horariosdetalles WHERE (horarios.materiasID = materias.idMateria) AND (profeCargo = profesores.id) AND horarios.idhorarios = horariosdetalles.idHorario AND materiasID = ?', [id]);
 
     const idHorariosArray = Array.from(new Set(horarios.map((row) => row.idhorarios)));
-    console.log(alumnos);
+ 
 
     const conflicto = await pool.query(`SELECT m1.dia, m1.hora_inicio, m1.hora_fin, m1.idHorario as idHorario1, m2.idHorario as idHorario2, 
     m2.idDetalle as idDetalle2 FROM horariosdetalles m1 JOIN horariosdetalles m2 ON (m1.idHorario <> m2.idHorario AND m1.dia = m2.dia)
     WHERE ((m2.hora_inicio BETWEEN m1.hora_inicio AND m1.hora_fin) OR (m2.hora_fin BETWEEN m1.hora_inicio AND m1.hora_fin))
     AND m1.idHorario = ? `,[idHorariosArray]);
-    console.log(conflicto);
+    console.log("conflicto",conflicto);
     
 
 

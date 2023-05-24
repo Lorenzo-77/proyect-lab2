@@ -1,21 +1,33 @@
 ////// ITEMS //////🦖🦖🦖
+
 function index(req, res) {
     req.getConnection((err, conn) => {
       req.getConnection((err, conn) => {
-        conn.query(`SELECT materias.idMateria, materias.nombreMateria, horariosdetalles.dia, horariosdetalles.hora_inicio, horariosdetalles.hora_fin, profesores.nombre, profesores.apellido, horarios.idhorarios,alumnos.id
-        FROM horarios
+        conn.query(`SELECT DISTINCT
+        materias.idMateria,
+        materias.nombreMateria,
+        horariosdetalles.dia,
+        horariosdetalles.hora_inicio,
+        horariosdetalles.hora_fin,
+        profesores.nombre,
+        profesores.apellido,
+        horarios.idhorarios,
+        alumnos.id
+      FROM
+        horarios
         JOIN materias ON materias.idMateria = horarios.materiasID
         JOIN horariosdetalles ON horariosdetalles.idHorario = horarios.idhorarios
         JOIN profesores ON profesores.id = materias.profeCargo
-        JOIN alumnos 
-        WHERE alumnos.id = ? `, [req.user.id], (err, horario) => {
+        JOIN alumnos ON alumnos.id = ?
+      WHERE
+        NOT EXISTS (
+          SELECT *
+          FROM inscripciones
+          WHERE inscripciones.idAlumno = alumnos.id
+            AND inscripciones.materiaId = horarios.idhorarios
+            AND inscripciones.valAlumno = 'Valido'
+        )  `, [req.user.id], (err, horario) => {
 
-          conn.query(`SELECT DISTINCT nombreMateria AS NM FROM inscripciones, materias 
-          WHERE materias.profeCargo = inscripciones.idProfesor 
-          AND materias.idMateria = inscripciones.materiaId AND  inscripciones.idAlumno = ? `, [req.user.id], (err, nMateria) => {
-          if(err) {
-            res.json(err);
-          }
           const materias = horario.reduce((acc, cur) => {
             if (!acc[cur.idMateria]) {
               acc[cur.idMateria] = {
@@ -37,11 +49,10 @@ function index(req, res) {
             return acc;
           }, {});
           const materiasArr = Object.values(materias);
-          res.render('materias/verMaterias', { materiasArr, nMateria });
+          res.render('materias/verMaterias', { materiasArr });
         });
       });
     });
-  });
 }
 
   function inscribir(req, res) {
