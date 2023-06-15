@@ -78,66 +78,7 @@ function insertMateria(req, res) {
     });
   });
 }
-  /* antiguo
-  function insertMateria(req, res) {
-    let myVar = undefined;
-    var {materiasID, horaInicioLunes, horaFinLunes, lunes, horaInicioMartes, horaFinMartes, martes, horaInicioMiercoles, horaFinMiercoles, miercoles, horaInicioJueves, horaFinJueves, jueves, horaInicioViernes, horaFinViernes, viernes } = req.body;
-    console.log(horaInicioLunes);
-    if( horaInicioLunes === "" && horaFinLunes === ""){
-        horaInicioLunes = null;
-        horaFinLunes = null;
-    }
-    if( horaInicioMartes === "" && horaFinMartes === ""){
-        horaInicioMartes = null;
-        horaFinMartes = null;
-    }
-    if( horaInicioMiercoles === "" && horaFinMiercoles === ""){
-        horaInicioMiercoles = null;
-        horaFinMiercoles = null;
-    }
-    if( horaInicioJueves === "" && horaFinJueves === ""){
-        horaInicioJueves = null;
-        horaFinJueves = null;
-    }
-    if( horaInicioViernes === "" && horaFinViernes === ""){
-        horaInicioViernes = null;
-        horaFinViernes = null;
-    }
-    const  nuevoHorario = {
-        materiasID,
-        horaInicioLunes,
-        horaFinLunes,
-        lunes,
-        horaInicioMartes,
-        horaFinMartes,
-        martes,
-        horaInicioMiercoles,
-        horaFinMiercoles,
-        miercoles,
-        horaInicioJueves,
-        horaFinJueves,
-        jueves,
-        horaInicioViernes,
-        horaFinViernes,
-        viernes
-    };
-
-    req.getConnection((err, conn) => {
-        conn.query('SELECT materiasID FROM `horarios` WHERE materiasID = ? ', [materiasID], (err, materia) => {
-        console.log(materia[0]);
-        if( materia[0] == myVar){
-          conn.query('INSERT INTO horarios set ?',[nuevoHorario], (err, lista) => {
-          if(err) {
-            res.json(err);
-          }
-          res.redirect('/materias');
-        });
-    }
-      });
-    });
-  }
-*/
-
+  
   function create(req, res) {
     res.render('tasks/create');
   }
@@ -162,21 +103,12 @@ function insertMateria(req, res) {
     const {materia} = req.params;
 
     console.log(materia, id)
-/*SELECT * 
 
-FROM fechas 
-JOIN materias ON fechas.materiaId = materias.idMateria 
-JOIN horarios ON materias.idMateria = horarios.materiasID 
-JOIN horariosdetalles ON horarios.idhorarios = horariosdetalles.idHorario 
-WHERE materias.idMateria = 14 
-AND horariosdetalles.dia IN ('lunes', 'jueves') 
-AND fechas.tipo_fecha = 'cuatrimestre' 
-AND fechas.fecha_inicio = '2023-05-15' 
-AND fechas.fecha_fin = '2023-09-14';
- Importante*/
 
     const nombreMat = await pool.query('SELECT nombreMateria FROM `materias` WHERE idMateria = ?', [materia]);
-    const fechas = await pool.query(`SELECT DISTINCT DATE_ADD(fecha_inicio, INTERVAL n.num DAY) AS fecha 
+
+    const fechas = await pool.query('CALL sp_obtener_fechas(?)', [materia]);
+    const fechas2 = await pool.query(`SELECT DISTINCT DATE_ADD(fecha_inicio, INTERVAL n.num DAY) AS fecha 
     FROM fechas INNER JOIN materias ON fechas.materiaId = materias.idMateria 
     INNER JOIN horariosdetalles ON horariosdetalles.idHorario = materias.idMateria
     CROSS JOIN (
@@ -189,15 +121,17 @@ AND fechas.fecha_fin = '2023-09-14';
         AND DATE_ADD(fecha_inicio, INTERVAL n.num DAY) BETWEEN fecha_inicio AND fecha_fin
       AND (DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 2 OR DAYOFWEEK(DATE_ADD(fecha_inicio, INTERVAL n.num DAY)) = 5)`, [materia]);
 
-    const asist = await pool.query('SELECT DISTINCT email, nombre, apellido, fecha, presente FROM asistencias, horarios, alumnos WHERE asistencias.horaId = horarios.idhorarios AND alumnos.id = asistencias.alumnoId AND idhorarios = ? ', [id]);
+    console.log(fechas2)
     
+    const alumnos = await pool.query(`SELECT DISTINCT email, nombre, apellido, fecha, presente, dni, hora, dictado FROM asistencias, horarios, alumnos 
+    WHERE asistencias.horaId = horarios.idhorarios AND alumnos.id = asistencias.alumnoId AND idhorarios = ?`, [id]);
 
-/*
-    const asist5 = await pool.query('CALL PR_TABLA(?,?)', [id, materia]);
+    const asist5  = await pool.query('CALL sp_obtener_datos(?, ?)', [materia, id]);
     const [asistZZ] = asist5;
     const keys = [...new Set(asistZZ.flatMap((content) => Object.keys(content)))];
-    const titleKeys = keys.map((key) => key.replace('_', '/'));*/
-    res.render('materias/asistencia',{nombreMat,fechas}); //res.render('horarios/asistencia', {asist, fecha, id,  asistZZ , titleKeys, keys, nombreMat});
+    const titleKeys = keys.map((key) => key.replace('_', '/'));
+
+    res.render('materias/asistencia',{nombreMat,fechas, alumnos,  asistZZ , titleKeys, keys}); //res.render('horarios/asistencia', {asist, fecha, id,  asistZZ , titleKeys, keys, nombreMat});
   
   }
 

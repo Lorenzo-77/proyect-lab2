@@ -1,9 +1,14 @@
-<div class="container p-4">
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+  <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="generateReport()">
+    <i class="fas fa-download fa-sm text-white-50"></i> Descargar Excel
+  </button>
+</div>
+
         <div class="row text-center ">
              <div class="col md-3">
                  <div class="card text-center">
-            <h1> {{#nombreMat}} {{nombreMateria}} {{Año}} {{/nombreMat}}</h1>
-            <h2> ASISTENCIAS POR DIA a</h2>
+            <h3 class="bg-gradient-primary text-gray-100"> {{#nombreMat}} {{nombreMateria}} {{Año}} {{/nombreMat}}</h3>
+           <!-- <h2> ASISTENCIAS POR DIA </h2>
                 <form action="/asistencia/asisPD" method="GET">
                         <div class="form-group">   
                         <select id="jo" name="asisSel" onchange="myFunction()"> 
@@ -20,60 +25,28 @@
                                     Buscar
                                 </button>
                             </div>
-                        </form>
-                    <br>
-                    <h1> ASISTENCIAS DE TODA LA MATERIA</h1>    
-                    <br>
-                    <br>
-                        <table id="testTable" name="table" class="table table-hover">
+                        </form>-->
+                    <h3> ASISTENCIAS DE TODA LA MATERIA</h3>    
+
+                        <table class="table caption-top table-bordered">
+                           <thead>
                                 <tr>
                                     {{#each titleKeys as | key |}}
-                                    <th>{{key}}</th>
+                                    <th  scope="col">{{key}}</th>
                                     {{/each}}
                                 </tr>
+                            </thead>
+                            <tbody>
                                     {{#each asistZZ as | user |}}
                                 <tr>
                                     {{#each ../keys as | key |}}
-                                    <th>{{lookup user key}}</th>
+                                    <th  scope="col">{{lookup user key}}</th>
                                     {{/each}}
                                 </tr>
                                 {{/each}}
+                            </tbody>
                         </table>
-
-<table class="table caption-top">
-  <caption>
-    List of users
-  </caption>
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Larry</td>
-      <td>the Bird</td>
-      <td>@twitter</td>
-    </tr>
-  </tbody>
-</table>
-                    <input type="button" style="text-align:center;" onclick="tableToExcel('testTable', 'TABLA')" value="Exportar a Excel">                    
+                                    
             </div>
             
     </div>
@@ -82,20 +55,5 @@
                  </div>
              </div><!-- DIV DE las tablas para exponer-->
              
-                    </div>
 
 
-
-<script>
-    var tableToExcel = (function() {
-  var uri = 'data:application/vnd.ms-excel;base64,'
-    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
-    , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
-    , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
-  return function(table, name) {
-    if (!table.nodeType) table = document.getElementById(table)
-    var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
-    window.location.href = uri + base64(format(template, ctx))
-  }
-})()
-</script>    
